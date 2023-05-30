@@ -1,0 +1,10 @@
+.die-stock {
+
+    &.void-stock {
+        position: relative;
+
+        .die {
+            position: absolute;
+        }
+    }
+}

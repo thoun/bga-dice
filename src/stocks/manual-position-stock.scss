@@ -1,0 +1,10 @@
+.die-stock {
+
+    &.manual-position-stock {
+        position: relative;
+
+        .die {
+            position: absolute;
+        }
+    }
+}

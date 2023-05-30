@@ -1,0 +1,10 @@
+.bga-dice_die-stock {
+    .bga-dice_die.bga-dice_selectable-die:not(.bga-dice_disabled-die) {
+        cursor: pointer;
+    }
+
+    .bga-dice_die.bga-dice_disabled-die {
+        cursor: not-allowed;
+        filter: contrast(0.6);
+    }
+}

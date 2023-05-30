@@ -1,0 +1,13 @@
+body > .bga-dice_die {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+}
+
+.bga-dice_die {
+    flex-shrink: 0;
+    
+    .bga-dice_die-faces { 
+        position: relative;
+    }
+}

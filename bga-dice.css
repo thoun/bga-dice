@@ -1,0 +1,54 @@
+body > .bga-dice_die {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+}
+
+.bga-dice_die {
+  flex-shrink: 0;
+}
+.bga-dice_die .bga-dice_die-faces {
+  position: relative;
+}
+
+.bga-dice_die-stock .bga-dice_die.bga-dice_selectable-die:not(.bga-dice_disabled-die) {
+  cursor: pointer;
+}
+.bga-dice_die-stock .bga-dice_die.bga-dice_disabled-die {
+  cursor: not-allowed;
+  filter: contrast(0.6);
+}
+
+.bga-dice_die-stock.bga-dice_line-stock {
+  display: flex;
+  gap: var(--gap);
+  flex-wrap: var(--wrap);
+  flex-direction: var(--direction);
+}
+.bga-dice_die-stock.bga-dice_line-stock[data-center=true] {
+  justify-content: center;
+}
+
+.die-stock.slot-stock {
+  display: flex;
+  gap: var(--gap);
+  flex-wrap: var(--wrap);
+  flex-direction: var(--direction);
+}
+.die-stock.slot-stock[data-center=true] {
+  justify-content: center;
+}
+
+.die-stock.manual-position-stock {
+  position: relative;
+}
+.die-stock.manual-position-stock .die {
+  position: absolute;
+}
+
+.die-stock.void-stock {
+  position: relative;
+}
+.die-stock.void-stock .die {
+  position: absolute;
+}
