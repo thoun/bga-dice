@@ -1,12 +1,13 @@
 interface Die {
     type: number | string;
     id: number;
-    face: number;    
+    face: number;
 }
 
 interface DieType {
     facesCount: number;
     dieTypeClass: string;
+    size?: number;
 
     /**
      * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.

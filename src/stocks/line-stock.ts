@@ -23,7 +23,7 @@ interface LineStockSettings extends DieStockSettings {
 /**
  * A basic stock for a list of dice, based on flex.
  */
-class LineStock extends DiceStock {
+class LineDiceStock extends DiceStock {
     /**
      * @param manager the die manager  
      * @param element the stock element (should be an empty HTML Element)

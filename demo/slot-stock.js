@@ -3,14 +3,14 @@ let slotStockDie1;
 let slotStockDie2;
 
 function initSlotStock() {
-    slotStock = new SlotStock(diceManager, document.getElementById('slot-stock'), {
+    slotStock = new SlotDiceStock(diceManager, document.getElementById('slot-stock'), {
         slotsIds: ['A', 'B', 'C'],
         slotClasses: ['mygame-slot'],
         mapDieToSlot: (die) => die.location,
     });
 
-    slotStockDie1 = { id: getDieId(), type: 3, type_arg: 2, location: 'A', location_arg: 0 };
-    slotStockDie2 = { id: getDieId(), type: 1, type_arg: 5, location: 'C', location_arg: 0 };
+    slotStockDie1 = { id: getDieId(), type: 0, type_arg: 2, location: 'A', location_arg: 0 };
+    slotStockDie2 = { id: getDieId(), type: 0, type_arg: 5, location: 'C', location_arg: 0 };
 
     // add dice
     slotStock.addDice([

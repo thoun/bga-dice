@@ -6,8 +6,41 @@ body > .bga-dice_die {
 
 .bga-dice_die {
     flex-shrink: 0;
+    position: relative;
+    width: var(--size);
+    height: var(--size);
+    display: inline-block;
+    
+    transform-style: preserve-3d; 
+    transform-origin: center center;
     
     .bga-dice_die-faces { 
         position: relative;
+        display: inline-block;
+
+        .bga-dice_die-face {
+            position: absolute;
+            width: var(--size);
+            height: var(--size);
+            display: inline-block;
+            //backface-visibility: hidden;
+        }
     }
+    
+
+  &[data-rolled="true"] {
+    animation: rolled-dice 1s forwards linear;
+    transform: translateY(calc(var(--size) * -5));
+  }
+
+  @keyframes rolled-dice {
+    /* TODO find a better rebound effect animation
+     0% {  transform: translateY(calc(var(--size) * -5)) translateZ(calc(var(--size) * 5)); }
+    20% { transform: translateY(calc(var(--size) * -4)) translateZ(0)}
+    40% { transform: translateY(calc(var(--size) * -3)) translateZ(calc(var(--size) * 5)); }
+    60% { transform: translateY(calc(var(--size) * -2)) translateZ(0); }
+    80% { transform: translateY(calc(var(--size) * -1)) translateZ(calc(var(--size) * 5)); }
+    */
+    100% { transform: initial; }
+  }
 }

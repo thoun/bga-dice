@@ -7,6 +7,11 @@ interface DieStockSettings {
     sort?: SortFunction;
 
     /**
+     * Perspective effect on Stock elements. Default 1000px. Can be overriden on each stock.
+     */
+    perspective?: number | null;
+
+    /**
      * The class to apply to selectable dice. Use class from manager is unset.
      */
     selectableDieClass?: string | null;
@@ -49,7 +54,7 @@ interface AddDieSettings {
 interface RemoveDieSettings {
 }
 
-type DiceelectionMode = 'none' | 'single' | 'multiple';
+type DiceSelectionMode = 'none' | 'single' | 'multiple';
 
 /**
  * The abstract stock. It shouldn't be used directly, use stocks that extends it.
@@ -57,7 +62,7 @@ type DiceelectionMode = 'none' | 'single' | 'multiple';
 class DiceStock {
     protected dice: Die[] = [];
     protected selectedDice: Die[] = [];
-    protected selectionMode: DiceelectionMode = 'none';
+    protected selectionMode: DiceSelectionMode = 'none';
     protected sort?: SortFunction; 
 
     /**
@@ -82,6 +87,8 @@ class DiceStock {
     constructor(protected manager: DiceManager, protected element: HTMLElement, private settings?: DieStockSettings) {
         manager.addStock(this);
         element?.classList.add('bga-dice_die-stock'/*, this.constructor.name.split(/(?=[A-Z])/).join('-').toLowerCase()* doesn't work in production because of minification */);
+        const perspective = this.getPerspective();
+        element.style.setProperty('--perspective', perspective ? `${perspective}px` : 'unset');
         this.bindClick();
 
         this.sort = settings?.sort;
@@ -375,7 +382,7 @@ class DiceStock {
      * @param selectionMode the selection mode
      * @param selectableDice the selectable dice (all if unset). Calls `setSelectableDice` method
      */
-    public setSelectionMode(selectionMode: DiceelectionMode, selectableDice?: Die[]) {
+    public setSelectionMode(selectionMode: DiceSelectionMode, selectableDice?: Die[]) {
         if (selectionMode !== this.selectionMode) {
             this.unselectAll(true);
         }
@@ -560,6 +567,13 @@ class DiceStock {
 
         const result = await this.manager.animationManager.play(animation);
         return result?.played ?? false;
+    }
+
+    /**
+     * @returns the perspective for this stock.
+     */
+    private getPerspective(): number | null {
+        return this.settings?.perspective === undefined ? this.manager.getPerspective() : this.settings?.perspective;
     }
 
     /**

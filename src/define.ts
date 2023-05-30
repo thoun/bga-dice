@@ -3,9 +3,9 @@ declare const define;
 define({ 
     DiceManager,
     DiceStock,
-    LineStock,
-    SlotStock,
-    ManualPositionStock,
-    VoidStock,
+    LineDiceStock,
+    SlotDiceStock,
+    ManualPositionDiceStock,
+    VoidDiceStock,
     sortFunction,
  });

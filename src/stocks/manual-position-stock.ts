@@ -1,15 +1,15 @@
 /**
  * A stock with manually placed dice
  */
-class ManualPositionStock extends DiceStock {
+class ManualPositionDiceStock extends DiceStock {
 
     /**
      * @param manager the die manager  
      * @param element the stock element (should be an empty HTML Element)
      */
-    constructor(protected manager: DiceManager, protected element: HTMLElement, settings: DieStockSettings, protected updateDisplay: (element: HTMLElement, dice: Die[], lastDie: Die, stock: ManualPositionStock) => any) {
+    constructor(protected manager: DiceManager, protected element: HTMLElement, settings: DieStockSettings, protected updateDisplay: (element: HTMLElement, dice: Die[], lastDie: Die, stock: ManualPositionDiceStock) => any) {
         super(manager, element, settings);
-        element.classList.add('manual-position-stock');
+        element.classList.add('bga-dice_manual-position-stock');
     }
 
     /**

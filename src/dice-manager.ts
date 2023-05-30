@@ -7,6 +7,11 @@ interface DiceManagerSettings {
     dieTypes?: {[dieType: number | string]: DieType };
 
     /**
+     * Perspective effect on Stock elements. Default 1000px. Can be overriden on each stock.
+     */
+    perspective?: number | null;
+
+    /**
      * The class to apply to selectable dice. Default 'bga-dice_selectable-die'.
      */
     selectableDieClass?: string | null;
@@ -76,8 +81,9 @@ class DiceManager {
 
         const element = document.createElement("div");
         element.id = id;
-        element.classList.add('bga-dice_die');
+        element.classList.add('bga-dice_die', dieType.dieTypeClass);
         element.dataset.visibleFace = ''+die.face;
+        element.style.setProperty('--size', `${dieType.size ?? 50}px`);
         
         const dieFaces = document.createElement("div");
         dieFaces.classList.add('bga-dice_die-faces');
@@ -163,6 +169,13 @@ class DiceManager {
                 (stock as any).dice.splice(dieIndex, 1, die);
             }
         }
+    }
+
+    /**
+     * @returns the default perspective for all stocks.
+     */
+    public getPerspective(): number | null {
+        return this.settings?.perspective === undefined ? 1000 : this.settings?.perspective;
     }
 
     /**

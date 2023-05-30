@@ -1,9 +1,7 @@
 let lineStock;
-let lineStockOverlap;
-let lineStockVerticalOverlap;
 
 function initLineStock() {
-    lineStock = new LineStock(diceManager, document.getElementById('line-stock'), {
+    lineStock = new LineDiceStock(diceManager, document.getElementById('line-stock'), {
         sort: sortFunction('type', 'type_arg')
     });
     lineStock.setSelectionMode('multiple');
@@ -48,37 +46,13 @@ function addDieToLineStockWithAnimation(fromElement, customAnimation) {
     }
 
     lineStock.addDie(
-        { id: getDieId(), type: 1 + Math.floor(Math.random() * 4), type_arg: 1 + Math.floor(Math.random() * 10), location: 'table', location_arg: 0 },
+        { id: getDieId(), type: 0 + Math.floor(Math.random() * 4), type_arg: 1 + Math.floor(Math.random() * 10), location: 'table', location_arg: 0 },
         animationSettings
     );
 }
 
 function addDieToLineStockFromVoidStock() {
-    const die = { id: getDieId(), type: 1 + Math.floor(Math.random() * 4), type_arg: 1 + Math.floor(Math.random() * 10), location: 'table', location_arg: 0 }
+    const die = { id: getDieId(), type: 0 + Math.floor(Math.random() * 4), type_arg: 1 + Math.floor(Math.random() * 10), location: 'table', location_arg: 0 }
     voidStock.addDie({ id: die.id }, undefined, { remove: false, });
     lineStock.addDie(die);
-}
-
-function initLineStockOverlap() {
-    lineStockOverlap = new LineStock(diceManager, document.getElementById('line-stock-overlap'));
-
-    // add dice
-    lineStockOverlap.addDice([
-        { id: getDieId(), type: 3, type_arg: 2, location: 'table', location_arg: 0 },
-        { id: getDieId(), type: 1, type_arg: 5, location: 'table', location_arg: 0 },
-        { id: getDieId(), type: 1, type_arg: 6, location: 'table', location_arg: 0 },
-    ]);
-}
-
-function initLineStockVerticalOverlap() {
-    lineStockVerticalOverlap = new LineStock(diceManager, document.getElementById('line-stock-vertical-overlap'), {
-        direction: 'column',
-    });
-
-    // add dice
-    lineStockVerticalOverlap.addDice([
-        { id: getDieId(), type: 3, type_arg: 2, location: 'table', location_arg: 0 },
-        { id: getDieId(), type: 1, type_arg: 5, location: 'table', location_arg: 0 },
-        { id: getDieId(), type: 1, type_arg: 6, location: 'table', location_arg: 0 },
-    ]);
 }

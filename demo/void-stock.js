@@ -1,7 +1,7 @@
 let voidStock;
 
 function initVoidStock() {
-    voidStock = new VoidStock(diceManager, document.getElementById('void-stock'));
+    voidStock = new VoidDiceStock(diceManager, document.getElementById('void-stock'));
 }
 
 function addDieToVoidStock(fromElement) {

@@ -277,6 +277,7 @@ interface Die {
 interface DieType {
     facesCount: number;
     dieTypeClass: string;
+    size?: number;
     /**
      * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.
      *
@@ -311,6 +312,10 @@ interface DieStockSettings {
      */
     sort?: SortFunction;
     /**
+     * Perspective effect on Stock elements. Default 1000px. Can be overriden on each stock.
+     */
+    perspective?: number | null;
+    /**
      * The class to apply to selectable dice. Use class from manager is unset.
      */
     selectableDieClass?: string | null;
@@ -344,7 +349,7 @@ interface AddDieSettings {
 }
 interface RemoveDieSettings {
 }
-type DiceelectionMode = 'none' | 'single' | 'multiple';
+type DiceSelectionMode = 'none' | 'single' | 'multiple';
 /**
  * The abstract stock. It shouldn't be used directly, use stocks that extends it.
  */
@@ -354,7 +359,7 @@ declare class DiceStock {
     private settings?;
     protected dice: Die[];
     protected selectedDice: Die[];
-    protected selectionMode: DiceelectionMode;
+    protected selectionMode: DiceSelectionMode;
     protected sort?: SortFunction;
     /**
      * Called when selection change. Returns the selection.
@@ -463,7 +468,7 @@ declare class DiceStock {
      * @param selectionMode the selection mode
      * @param selectableDice the selectable dice (all if unset). Calls `setSelectableDice` method
      */
-    setSelectionMode(selectionMode: DiceelectionMode, selectableDice?: Die[]): void;
+    setSelectionMode(selectionMode: DiceSelectionMode, selectableDice?: Die[]): void;
     protected setSelectableDie(die: Die, selectable: boolean): void;
     /**
      * Set the selectable class for each die.
@@ -498,6 +503,10 @@ declare class DiceStock {
      * @param fromElement The HTMLElement to animate from.
      */
     protected animationFromElement(element: HTMLElement, fromRect: DOMRect, settings: DieAnimationSettings): Promise<boolean>;
+    /**
+     * @returns the perspective for this stock.
+     */
+    private getPerspective;
     /**
      * @returns the class to apply to selectable dice. Use class from manager is unset.
      */
@@ -534,7 +543,7 @@ interface LineStockSettings extends DieStockSettings {
 /**
  * A basic stock for a list of dice, based on flex.
  */
-declare class LineStock extends DiceStock {
+declare class LineDiceStock extends DiceStock {
     protected manager: DiceManager;
     protected element: HTMLElement;
     /**
@@ -568,7 +577,7 @@ interface AddDieToSlotSettings extends AddDieSettings {
 /**
  * A stock with fixed slots (some can be empty)
  */
-declare class SlotStock extends LineStock {
+declare class SlotDiceStock extends LineDiceStock {
     protected manager: DiceManager;
     protected element: HTMLElement;
     protected slotsIds: SlotId[];
@@ -609,15 +618,15 @@ declare class SlotStock extends LineStock {
 /**
  * A stock with manually placed dice
  */
-declare class ManualPositionStock extends DiceStock {
+declare class ManualPositionDiceStock extends DiceStock {
     protected manager: DiceManager;
     protected element: HTMLElement;
-    protected updateDisplay: (element: HTMLElement, dice: Die[], lastDie: Die, stock: ManualPositionStock) => any;
+    protected updateDisplay: (element: HTMLElement, dice: Die[], lastDie: Die, stock: ManualPositionDiceStock) => any;
     /**
      * @param manager the die manager
      * @param element the stock element (should be an empty HTML Element)
      */
-    constructor(manager: DiceManager, element: HTMLElement, settings: DieStockSettings, updateDisplay: (element: HTMLElement, dice: Die[], lastDie: Die, stock: ManualPositionStock) => any);
+    constructor(manager: DiceManager, element: HTMLElement, settings: DieStockSettings, updateDisplay: (element: HTMLElement, dice: Die[], lastDie: Die, stock: ManualPositionDiceStock) => any);
     /**
      * Add a die to the stock.
      *
@@ -640,7 +649,7 @@ interface AddDieToVoidStockSettings extends AddDieSettings {
 /**
  * A stock to make dice disappear (to automatically remove disdieed dice, or to represent a bag)
  */
-declare class VoidStock extends DiceStock {
+declare class VoidDiceStock extends DiceStock {
     protected manager: DiceManager;
     protected element: HTMLElement;
     /**
@@ -666,6 +675,10 @@ interface DiceManagerSettings {
     dieTypes?: {
         [dieType: number | string]: DieType;
     };
+    /**
+     * Perspective effect on Stock elements. Default 1000px. Can be overriden on each stock.
+     */
+    perspective?: number | null;
     /**
      * The class to apply to selectable dice. Default 'bga-dice_selectable-die'.
      */
@@ -725,6 +738,10 @@ declare class DiceManager {
      * @param die the die informations
      */
     updateDieInformations(die: Die, updateData?: boolean): void;
+    /**
+     * @returns the default perspective for all stocks.
+     */
+    getPerspective(): number | null;
     /**
      * @returns the class to apply to selectable dice. Default 'bga-dice_selectable-die'.
      */

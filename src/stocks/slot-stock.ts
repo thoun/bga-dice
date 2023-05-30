@@ -27,7 +27,7 @@ interface AddDieToSlotSettings extends AddDieSettings {
 /**
  * A stock with fixed slots (some can be empty)
  */
-class SlotStock extends LineStock {
+class SlotDiceStock extends LineDiceStock {
     protected slotsIds: SlotId[] = [];
     protected slots: HTMLDivElement[] = [];
     protected slotClasses: string[];
@@ -40,7 +40,7 @@ class SlotStock extends LineStock {
      */
     constructor(protected manager: DiceManager, protected element: HTMLElement, settings: SlotStockSettings) {
         super(manager, element, settings);
-        element.classList.add('slot-stock');
+        element.classList.add('bga-dice_slot-stock');
 
         this.mapDieToSlot = settings.mapDieToSlot;
         this.slotsIds = settings.slotsIds ?? [];

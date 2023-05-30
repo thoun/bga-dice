@@ -10,7 +10,7 @@ interface AddDieToVoidStockSettings extends AddDieSettings {
 /**
  * A stock to make dice disappear (to automatically remove disdieed dice, or to represent a bag)
  */
-class VoidStock extends DiceStock {
+class VoidDiceStock extends DiceStock {
 
     /**
      * @param manager the die manager  
@@ -18,7 +18,7 @@ class VoidStock extends DiceStock {
      */
     constructor(protected manager: DiceManager, protected element: HTMLElement) {
         super(manager, element);
-        element.classList.add('void-stock');
+        element.classList.add('bga-dice_void-stock');
     }
 
     /**

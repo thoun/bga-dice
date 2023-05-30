@@ -33,23 +33,19 @@ h1, h2 {
 }
 
 .bga-dice_die .bga-dice_die-faces {
-    display: flex; /* TODO temp */
+    /*display: flex; /* TODO temp */
 }
 
 .colored-die .bga-dice_die-face {
     background: url('dice.jpg');
     background-size: 600% 600%;
     border-radius: 5px;
-    width: 50px;
-    height: 50px;
 }
 
 .white-die .bga-dice_die-face {
     background: url('white-die.png');
     background-size: 600% 100%;
     border-radius: 5px;
-    width: 50px;
-    height: 50px;
 }
 
 .bga-dice_die .bga-dice_die-face[data-face="1"] {

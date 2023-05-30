@@ -1,6 +1,5 @@
 let manualPositionDiagonalStock;
 let manualPositionCurveStock;
-let manualPositionFitStock;
 
 function manualPositionDiagonalUpdateDisplay(element, dice, lastDie, stock) {
     dice.forEach((die, index) => {
@@ -14,13 +13,13 @@ function manualPositionDiagonalUpdateDisplay(element, dice, lastDie, stock) {
 }
 
 function initManualPositionDiagonalStock() {
-    manualPositionDiagonalStock = new ManualPositionStock(diceManager, document.getElementById('manual-position-diagonal-stock'), undefined, manualPositionDiagonalUpdateDisplay);
+    manualPositionDiagonalStock = new ManualPositionDiceStock(diceManager, document.getElementById('manual-position-diagonal-stock'), undefined, manualPositionDiagonalUpdateDisplay);
 
     // add dice
     manualPositionDiagonalStock.addDice([
-        { id: getDieId(), type: 3, type_arg: 2, location: 'table', location_arg: 0 },
-        { id: getDieId(), type: 1, type_arg: 5, location: 'table', location_arg: 0 },
-        { id: getDieId(), type: 3, type_arg: 2, location: 'table', location_arg: 0 },
+        { id: getDieId(), type: 0, type_arg: 2, location: 'table', location_arg: 0 },
+        { id: getDieId(), type: 0, type_arg: 5, location: 'table', location_arg: 0 },
+        { id: getDieId(), type: 0, type_arg: 2, location: 'table', location_arg: 0 },
     ]);
 }
 
@@ -43,15 +42,17 @@ function reallyPoorBezierResolver(curvePoints, x) {
 }
 
 function manualPositionCurveUpdateDisplay(element, dice, lastDie, stock) {
+    const dieSize = 50;
+
     dice.forEach((die, index) => {
         const dieDiv = stock.getDieElement(die);
-        const left = canvasWidth / 2 + ((dieWidth + 10) * (index - (dice.length) / 2));
-        const x = (left + dieWidth / 2) / curveXScale;
+        const left = canvasWidth / 2 + ((dieSize + 10) * (index - (dice.length) / 2));
+        const x = (left + dieSize / 2) / curveXScale;
 
         const y = reallyPoorBezierResolver(curvePoints, x);
 
         dieDiv.style.left = `${left}px`;
-        dieDiv.style.top = `${y * curveYScale - dieHeight / 2}px`;
+        dieDiv.style.top = `${y * curveYScale - dieSize / 2}px`;
     });
 }
 
@@ -79,57 +80,12 @@ function initManualPositionCurveStock() {
     }
     ctx.stroke();
 
-    manualPositionCurveStock = new ManualPositionStock(diceManager, document.getElementById('manual-position-curve-stock'), undefined, manualPositionCurveUpdateDisplay);
+    manualPositionCurveStock = new ManualPositionDiceStock(diceManager, document.getElementById('manual-position-curve-stock'), undefined, manualPositionCurveUpdateDisplay);
 
     // add dice
     manualPositionCurveStock.addDice([
-        { id: getDieId(), type: 3, type_arg: 2, location: 'table', location_arg: 0 },
-        { id: getDieId(), type: 1, type_arg: 5, location: 'table', location_arg: 0 },
-        { id: getDieId(), type: 3, type_arg: 2, location: 'table', location_arg: 0 },
+        { id: getDieId(), type: 0, type_arg: 2, location: 'table', location_arg: 0 },
+        { id: getDieId(), type: 0, type_arg: 5, location: 'table', location_arg: 0 },
+        { id: getDieId(), type: 0, type_arg: 2, location: 'table', location_arg: 0 },
     ]);
-}
-
-function manualPositionFitUpdateDisplay(element, dice, lastDie, stock) {
-    const halfClientWidth = element.clientWidth / 2;
-    const MARGIN = 8;
-    const DIE_WIDTH = 100;
-    let dieDistance = DIE_WIDTH + MARGIN;
-    const containerWidth = element.clientWidth;
-    const uncompressedWidth = (dice.length * DIE_WIDTH) + ((dice.length - 1) * MARGIN);
-    if (uncompressedWidth > containerWidth) {
-        dieDistance = Math.floor(DIE_WIDTH * containerWidth / (dice.length * DIE_WIDTH));
-    }
-
-    dice.forEach((die, index) => {
-        const dieDiv = stock.getDieElement(die);
-        const dieLeft = halfClientWidth + dieDistance * (index - (dice.length - 1) / 2);
-
-        dieDiv.style.left = `${ dieLeft - DIE_WIDTH / 2 }px`;
-    });
-}
-
-function initManualPositionFitStock() {
-    manualPositionFitStock = new ManualPositionStock(diceManager, document.getElementById('manual-position-fit-stock'), undefined, manualPositionFitUpdateDisplay);
-
-    // add dice
-    manualPositionFitStock.addDice([
-        { id: getDieId(), type: 3, type_arg: 2, location: 'table', location_arg: 0 },
-        { id: getDieId(), type: 1, type_arg: 5, location: 'table', location_arg: 0 },
-    ]);
-}
-
-function addDieToManualFitStock(fromElement) {
-    manualPositionFitStock.addDie(
-        { id: getDieId(), type: 3, type_arg: 2, location: 'table', location_arg: 0 },
-        {
-            fromElement: fromElement,
-            originalSide: 'back'
-        }
-    );
-}
-
-function removeDieToManualFitStock() {
-    if (!manualPositionFitStock.isEmpty()) {
-        manualPositionFitStock.removeDie(manualPositionFitStock.getDice()[0]);
-    }
 }

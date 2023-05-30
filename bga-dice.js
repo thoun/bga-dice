@@ -505,6 +505,8 @@ var DiceStock = /** @class */ (function () {
         this.selectionMode = 'none';
         manager.addStock(this);
         element === null || element === void 0 ? void 0 : element.classList.add('bga-dice_die-stock' /*, this.constructor.name.split(/(?=[A-Z])/).join('-').toLowerCase()* doesn't work in production because of minification */);
+        var perspective = this.getPerspective();
+        element.style.setProperty('--perspective', perspective ? "".concat(perspective, "px") : 'unset');
         this.bindClick();
         this.sort = settings === null || settings === void 0 ? void 0 : settings.sort;
     }
@@ -978,6 +980,13 @@ var DiceStock = /** @class */ (function () {
         });
     };
     /**
+     * @returns the perspective for this stock.
+     */
+    DiceStock.prototype.getPerspective = function () {
+        var _a, _b;
+        return ((_a = this.settings) === null || _a === void 0 ? void 0 : _a.perspective) === undefined ? this.manager.getPerspective() : (_b = this.settings) === null || _b === void 0 ? void 0 : _b.perspective;
+    };
+    /**
      * @returns the class to apply to selectable dice. Use class from manager is unset.
      */
     DiceStock.prototype.getSelectableDieClass = function () {
@@ -1012,14 +1021,14 @@ var DiceStock = /** @class */ (function () {
 /**
  * A basic stock for a list of dice, based on flex.
  */
-var LineStock = /** @class */ (function (_super) {
-    __extends(LineStock, _super);
+var LineDiceStock = /** @class */ (function (_super) {
+    __extends(LineDiceStock, _super);
     /**
      * @param manager the die manager
      * @param element the stock element (should be an empty HTML Element)
      * @param settings a `LineStockSettings` object
      */
-    function LineStock(manager, element, settings) {
+    function LineDiceStock(manager, element, settings) {
         var _this = this;
         var _a, _b, _c, _d;
         _this = _super.call(this, manager, element, settings) || this;
@@ -1032,19 +1041,19 @@ var LineStock = /** @class */ (function (_super) {
         element.style.setProperty('--gap', (_d = settings === null || settings === void 0 ? void 0 : settings.gap) !== null && _d !== void 0 ? _d : '8px');
         return _this;
     }
-    return LineStock;
+    return LineDiceStock;
 }(DiceStock));
 /**
  * A stock with fixed slots (some can be empty)
  */
-var SlotStock = /** @class */ (function (_super) {
-    __extends(SlotStock, _super);
+var SlotDiceStock = /** @class */ (function (_super) {
+    __extends(SlotDiceStock, _super);
     /**
      * @param manager the die manager
      * @param element the stock element (should be an empty HTML Element)
      * @param settings a `SlotStockSettings` object
      */
-    function SlotStock(manager, element, settings) {
+    function SlotDiceStock(manager, element, settings) {
         var _this = this;
         var _a, _b;
         _this = _super.call(this, manager, element, settings) || this;
@@ -1052,7 +1061,7 @@ var SlotStock = /** @class */ (function (_super) {
         _this.element = element;
         _this.slotsIds = [];
         _this.slots = [];
-        element.classList.add('slot-stock');
+        element.classList.add('bga-dice_slot-stock');
         _this.mapDieToSlot = settings.mapDieToSlot;
         _this.slotsIds = (_a = settings.slotsIds) !== null && _a !== void 0 ? _a : [];
         _this.slotClasses = (_b = settings.slotClasses) !== null && _b !== void 0 ? _b : [];
@@ -1061,7 +1070,7 @@ var SlotStock = /** @class */ (function (_super) {
         });
         return _this;
     }
-    SlotStock.prototype.createSlot = function (slotId) {
+    SlotDiceStock.prototype.createSlot = function (slotId) {
         var _a;
         this.slots[slotId] = document.createElement("div");
         this.slots[slotId].dataset.slotId = slotId;
@@ -1076,7 +1085,7 @@ var SlotStock = /** @class */ (function (_super) {
      * @param settings a `AddDieToSlotSettings` object
      * @returns the promise when the animation is done (true if it was animated, false if it wasn't)
      */
-    SlotStock.prototype.addDie = function (die, animation, settings) {
+    SlotDiceStock.prototype.addDie = function (die, animation, settings) {
         var _a, _b;
         var slotId = (_a = settings === null || settings === void 0 ? void 0 : settings.slot) !== null && _a !== void 0 ? _a : (_b = this.mapDieToSlot) === null || _b === void 0 ? void 0 : _b.call(this, die);
         if (slotId === undefined) {
@@ -1093,7 +1102,7 @@ var SlotStock = /** @class */ (function (_super) {
      *
      * @param slotsIds the new slotsIds. Will replace the old ones.
      */
-    SlotStock.prototype.setSlotsIds = function (slotsIds) {
+    SlotDiceStock.prototype.setSlotsIds = function (slotsIds) {
         var _this = this;
         if (slotsIds.length == this.slotsIds.length && slotsIds.every(function (slotId, index) { return _this.slotsIds[index] === slotId; })) {
             // no change
@@ -1106,7 +1115,7 @@ var SlotStock = /** @class */ (function (_super) {
             _this.createSlot(slotId);
         });
     };
-    SlotStock.prototype.canAddDie = function (die, settings) {
+    SlotDiceStock.prototype.canAddDie = function (die, settings) {
         var _a, _b;
         if (!this.contains(die)) {
             return true;
@@ -1123,7 +1132,7 @@ var SlotStock = /** @class */ (function (_super) {
      * @param dice the dice to swap
      * @param settings for `updateInformations` and `selectable`
      */
-    SlotStock.prototype.swapDice = function (dice, settings) {
+    SlotDiceStock.prototype.swapDice = function (dice, settings) {
         var _this = this;
         if (!this.mapDieToSlot) {
             throw new Error('You need to define SlotStock.mapDieToSlot to use SlotStock.swapDice');
@@ -1159,23 +1168,23 @@ var SlotStock = /** @class */ (function (_super) {
         });
         return Promise.all(promises);
     };
-    return SlotStock;
-}(LineStock));
+    return SlotDiceStock;
+}(LineDiceStock));
 /**
  * A stock with manually placed dice
  */
-var ManualPositionStock = /** @class */ (function (_super) {
-    __extends(ManualPositionStock, _super);
+var ManualPositionDiceStock = /** @class */ (function (_super) {
+    __extends(ManualPositionDiceStock, _super);
     /**
      * @param manager the die manager
      * @param element the stock element (should be an empty HTML Element)
      */
-    function ManualPositionStock(manager, element, settings, updateDisplay) {
+    function ManualPositionDiceStock(manager, element, settings, updateDisplay) {
         var _this = _super.call(this, manager, element, settings) || this;
         _this.manager = manager;
         _this.element = element;
         _this.updateDisplay = updateDisplay;
-        element.classList.add('manual-position-stock');
+        element.classList.add('bga-dice_manual-position-stock');
         return _this;
     }
     /**
@@ -1186,31 +1195,31 @@ var ManualPositionStock = /** @class */ (function (_super) {
      * @param settings a `AddDiceettings` object
      * @returns the promise when the animation is done (true if it was animated, false if it wasn't)
      */
-    ManualPositionStock.prototype.addDie = function (die, animation, settings) {
+    ManualPositionDiceStock.prototype.addDie = function (die, animation, settings) {
         var promise = _super.prototype.addDie.call(this, die, animation, settings);
         this.updateDisplay(this.element, this.getDice(), die, this);
         return promise;
     };
-    ManualPositionStock.prototype.dieRemoved = function (die) {
+    ManualPositionDiceStock.prototype.dieRemoved = function (die) {
         _super.prototype.dieRemoved.call(this, die);
         this.updateDisplay(this.element, this.getDice(), die, this);
     };
-    return ManualPositionStock;
+    return ManualPositionDiceStock;
 }(DiceStock));
 /**
  * A stock to make dice disappear (to automatically remove disdieed dice, or to represent a bag)
  */
-var VoidStock = /** @class */ (function (_super) {
-    __extends(VoidStock, _super);
+var VoidDiceStock = /** @class */ (function (_super) {
+    __extends(VoidDiceStock, _super);
     /**
      * @param manager the die manager
      * @param element the stock element (should be an empty HTML Element)
      */
-    function VoidStock(manager, element) {
+    function VoidDiceStock(manager, element) {
         var _this = _super.call(this, manager, element) || this;
         _this.manager = manager;
         _this.element = element;
-        element.classList.add('void-stock');
+        element.classList.add('bga-dice_void-stock');
         return _this;
     }
     /**
@@ -1221,7 +1230,7 @@ var VoidStock = /** @class */ (function (_super) {
      * @param settings a `AddDieToVoidStockSettings` object
      * @returns the promise when the animation is done (true if it was animated, false if it wasn't)
      */
-    VoidStock.prototype.addDie = function (die, animation, settings) {
+    VoidDiceStock.prototype.addDie = function (die, animation, settings) {
         var _this = this;
         var _a;
         var promise = _super.prototype.addDie.call(this, die, animation, settings);
@@ -1247,7 +1256,7 @@ var VoidStock = /** @class */ (function (_super) {
             return promise;
         }
     };
-    return VoidStock;
+    return VoidDiceStock;
 }(DiceStock));
 var DiceManager = /** @class */ (function () {
     /**
@@ -1284,7 +1293,7 @@ var DiceManager = /** @class */ (function () {
         return "bga-die-".concat(die.type, "-").concat(die.id);
     };
     DiceManager.prototype.createDieElement = function (die) {
-        var _a, _b;
+        var _a, _b, _c;
         var id = this.getId(die);
         if (this.getDieElement(die)) {
             throw new Error("This die already exists ".concat(JSON.stringify(die)));
@@ -1295,8 +1304,9 @@ var DiceManager = /** @class */ (function () {
         }
         var element = document.createElement("div");
         element.id = id;
-        element.classList.add('bga-dice_die');
+        element.classList.add('bga-dice_die', dieType.dieTypeClass);
         element.dataset.visibleFace = '' + die.face;
+        element.style.setProperty('--size', "".concat((_a = dieType.size) !== null && _a !== void 0 ? _a : 50, "px"));
         var dieFaces = document.createElement("div");
         dieFaces.classList.add('bga-dice_die-faces');
         element.appendChild(dieFaces);
@@ -1309,10 +1319,10 @@ var DiceManager = /** @class */ (function () {
             element.dataset.face = '' + i;
         }
         document.body.appendChild(element);
-        (_a = dieType.setupDieDiv) === null || _a === void 0 ? void 0 : _a.call(dieType, die, element);
+        (_b = dieType.setupDieDiv) === null || _b === void 0 ? void 0 : _b.call(dieType, die, element);
         if (dieType.setupFaceDiv) {
             for (var i = 1; i <= dieType.facesCount; i++) {
-                (_b = dieType.setupFaceDiv) === null || _b === void 0 ? void 0 : _b.call(dieType, die, facesElements[i], i);
+                (_c = dieType.setupFaceDiv) === null || _c === void 0 ? void 0 : _c.call(dieType, die, facesElements[i], i);
             }
         }
         document.body.removeChild(element);
@@ -1373,6 +1383,13 @@ var DiceManager = /** @class */ (function () {
         }
     };
     /**
+     * @returns the default perspective for all stocks.
+     */
+    DiceManager.prototype.getPerspective = function () {
+        var _a, _b;
+        return ((_a = this.settings) === null || _a === void 0 ? void 0 : _a.perspective) === undefined ? 1000 : (_b = this.settings) === null || _b === void 0 ? void 0 : _b.perspective;
+    };
+    /**
      * @returns the class to apply to selectable dice. Default 'bga-dice_selectable-die'.
      */
     DiceManager.prototype.getSelectableDieClass = function () {
@@ -1398,9 +1415,9 @@ var DiceManager = /** @class */ (function () {
 define({
     DiceManager: DiceManager,
     DiceStock: DiceStock,
-    LineStock: LineStock,
-    SlotStock: SlotStock,
-    ManualPositionStock: ManualPositionStock,
-    VoidStock: VoidStock,
+    LineDiceStock: LineDiceStock,
+    SlotDiceStock: SlotDiceStock,
+    ManualPositionDiceStock: ManualPositionDiceStock,
+    VoidDiceStock: VoidDiceStock,
     sortFunction: sortFunction,
 });
