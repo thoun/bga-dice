@@ -118,6 +118,17 @@ declare class BgaCumulatedAnimation<BgaCumulatedAnimationsSettings> extends BgaA
     constructor(settings: BgaCumulatedAnimationsSettings);
 }
 /**
+ * Just does nothing for the duration
+ *
+ * @param animationManager the animation manager
+ * @param animation a `BgaAnimation` object
+ * @returns a promise when animation ends
+ */
+declare function pauseAnimation(animationManager: AnimationManager, animation: IBgaAnimation<BgaAnimationSettings>): Promise<void>;
+declare class BgaPauseAnimation<BgaAnimation> extends BgaAnimation<any> {
+    constructor(settings: BgaAnimation);
+}
+/**
  * Linear slide of the element from origin to destination.
  *
  * @param animationManager the animation manager
@@ -276,7 +287,6 @@ interface Die {
 }
 interface DieType {
     facesCount: number;
-    dieTypeClass: string;
     size?: number;
     /**
      * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.
@@ -284,7 +294,7 @@ interface DieType {
      * @param die the die informations
      * @param element the die main Div element
      */
-    setupDieDiv?: (die: Die, element: HTMLDivElement) => void;
+    setupDieDiv: (die: Die, element: HTMLDivElement) => void;
     /**
      * Allow to populate a face div of the die. You can set classes or dataset to show the correct die face.
      *
@@ -300,9 +310,20 @@ declare class Die4 implements DieType {
     constructor();
 }
 declare class Die6 implements DieType {
+    protected borderRadius: number;
     facesCount: number;
-    dieTypeClass: string;
-    constructor();
+    /**
+     *
+     * @param borderRadius the border radius, in %
+     */
+    constructor(borderRadius?: number);
+    /**
+     * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.
+     *
+     * @param die the die informations
+     * @param element the die main Div element
+     */
+    setupDieDiv(die: Die, element: HTMLDivElement): void;
 }
 interface DieStockSettings {
     /**
@@ -347,9 +368,19 @@ interface AddDieSettings {
      */
     selectable?: boolean;
 }
-interface RemoveDieSettings {
+interface RollDieSettings {
+    /**
+     * Set the dice roll effect. Default 'rollIn';
+     */
+    effect?: DiceRollEffect;
+    /**
+     * Duration. A number (if fixed), or an array of 2, and it will be a random value between the 2 values.
+     * Default 1000.
+     */
+    duration: number | number[];
 }
 type DiceSelectionMode = 'none' | 'single' | 'multiple';
+type DiceRollEffect = 'rollIn' | 'rollInBump' | 'rollOutPauseAndBack' | 'rollOutBumpPauseAndBack' | 'turn' | 'none';
 /**
  * The abstract stock. It shouldn't be used directly, use stocks that extends it.
  */
@@ -439,28 +470,24 @@ declare class DiceStock {
      * Remove a die from the stock.
      *
      * @param die die die to remove
-     * @param settings a `RemoveDieSettings` object
      */
-    removeDie(die: Die, settings?: RemoveDieSettings): void;
+    removeDie(die: Die): void;
     /**
      * Notify the stock that a die is removed.
      *
      * @param die the die to remove
-     * @param settings a `RemoveDieSettings` object
      */
-    dieRemoved(die: Die, settings?: RemoveDieSettings): void;
+    dieRemoved(die: Die): void;
     /**
      * Remove a set of dice from the stock.
      *
      * @param dice the dice to remove
-     * @param settings a `RemoveDieSettings` object
      */
-    removeDice(dice: Die[], settings?: RemoveDieSettings): void;
+    removeDice(dice: Die[]): void;
     /**
      * Remove all dice from the stock.
-     * @param settings a `RemoveDiceettings` object
      */
-    removeAll(settings?: RemoveDieSettings): void;
+    removeAll(): void;
     /**
      * Set if the stock is selectable, and if yes if it can be multiple.
      * If set to 'none', it will unselect all selected dice.
@@ -521,6 +548,9 @@ declare class DiceStock {
     getSelectedDieClass(): string | null;
     removeSelectionClasses(die: Die): void;
     removeSelectionClassesFromElement(dieElement: HTMLElement): void;
+    protected addRollEffectToDieElement(die: Die, element: HTMLElement, effect: DiceRollEffect, duration: number): void;
+    rollDice(dice: Die[], settings?: RollDieSettings): void;
+    rollDie(die: Die, settings?: RollDieSettings): void;
 }
 interface LineStockSettings extends DieStockSettings {
     /**
@@ -711,6 +741,7 @@ declare class DiceManager {
     animationsActive(): boolean;
     addStock(stock: DiceStock): void;
     setDieType(type: number | string, dieType: DieType): void;
+    getDieType(die: Die): DieType;
     getId(die: Die): string;
     createDieElement(die: Die): HTMLDivElement;
     /**
@@ -722,9 +753,8 @@ declare class DiceManager {
      * Remove a die.
      *
      * @param die the die to remove
-     * @param settings a `RemoveDieSettings` object
      */
-    removeDie(die: Die, settings?: RemoveDieSettings): boolean;
+    removeDie(die: Die): boolean;
     /**
      * Returns the stock containing the die.
      *

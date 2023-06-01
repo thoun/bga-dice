@@ -4,11 +4,12 @@ class ColoredDie6 extends Die6 {
     color;
 
     constructor(color) {
-        super();
+        super(10);
         this.color = color;
     }
 
     setupDieDiv(die, element) {
+        super.setupDieDiv(die, element);
         element.classList.add('colored-die');
         element.dataset.color=''+this.color;
     }

@@ -23,18 +23,17 @@ function initLineStock() {
     ]);
 }
 
-function roll() {
+function roll(effect) {
     const dice = lineStock.getDice();
-    dice.forEach(die => {
-        const div = lineStock.getDieElement(die);
-        div.dataset.rolled = 'false';
-        div.clientWidth;
-        div.dataset.rolled = 'true';
-
-        const faces = div.querySelector('.bga-dice_die-faces');        
-        faces.dataset.rollType = '-';
-        div.clientWidth;
-        faces.dataset.rollType = 'even';
-        faces.dataset.roll = Math.floor(Math.random() * 6) + 1;
+    dice.forEach(die => die.value = Math.floor(Math.random() * 6) + 1);
+    lineStock.rollDice(dice, {
+        effect,
+        duration: [800, 1200]
     });
+}
+
+function change() {
+    const dice = lineStock.getDice();
+    dice.forEach(die => die.value = Math.floor(Math.random() * 6) + 1);
+    lineStock.changeDice(dice);
 }

@@ -62,6 +62,10 @@ class DiceManager {
     public setDieType(type: number | string, dieType: DieType) {
         this.registeredDieTypes[type] = dieType;
     }
+    
+    public getDieType(die: Die): DieType {
+        return this.registeredDieTypes[die.type];
+    }
 
     public getId(die: Die): string {
         return `bga-die-${die.type}-${die.id}`;
@@ -81,7 +85,7 @@ class DiceManager {
 
         const element = document.createElement("div");
         element.id = id;
-        element.classList.add('bga-dice_die', dieType.dieTypeClass);
+        element.classList.add('bga-dice_die');
         element.dataset.visibleFace = ''+die.face;
         element.style.setProperty('--size', `${dieType.size ?? 50}px`);
         
@@ -93,6 +97,7 @@ class DiceManager {
 
         for (let i = 1; i <= dieType.facesCount; i++) {            
             facesElements[i] = document.createElement("div");
+            facesElements[i].id = `${id}-face-${i}`;
             facesElements[i].classList.add('bga-dice_die-face');
             facesElements[i].dataset.face = ''+i;
             dieFaces.appendChild(facesElements[i]);
@@ -123,9 +128,8 @@ class DiceManager {
      * Remove a die.
      * 
      * @param die the die to remove
-     * @param settings a `RemoveDieSettings` object
      */
-    public removeDie(die: Die, settings?: RemoveDieSettings) {
+    public removeDie(die: Die) {
         const id = this.getId(die);
         const div = document.getElementById(id);
         if (!div) {
@@ -136,7 +140,7 @@ class DiceManager {
         div.remove();
 
         // if the die is in a stock, notify the stock about removal
-        this.getDieStock(die)?.dieRemoved(die, settings);
+        this.getDieStock(die)?.dieRemoved(die);
 
         return true;
     }

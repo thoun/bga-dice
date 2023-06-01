@@ -69,6 +69,29 @@ var BgaCumulatedAnimation = /** @class */ (function (_super) {
     return BgaCumulatedAnimation;
 }(BgaAnimation));
 /**
+ * Just does nothing for the duration
+ *
+ * @param animationManager the animation manager
+ * @param animation a `BgaAnimation` object
+ * @returns a promise when animation ends
+ */
+function pauseAnimation(animationManager, animation) {
+    var promise = new Promise(function (success) {
+        var _a;
+        var settings = animation.settings;
+        var duration = (_a = settings === null || settings === void 0 ? void 0 : settings.duration) !== null && _a !== void 0 ? _a : 500;
+        setTimeout(function () { return success(); }, duration);
+    });
+    return promise;
+}
+var BgaPauseAnimation = /** @class */ (function (_super) {
+    __extends(BgaPauseAnimation, _super);
+    function BgaPauseAnimation(settings) {
+        return _super.call(this, pauseAnimation, settings) || this;
+    }
+    return BgaPauseAnimation;
+}(BgaAnimation));
+/**
  * Linear slide of the element from origin to destination.
  *
  * @param animationManager the animation manager
@@ -329,24 +352,24 @@ var AnimationManager = /** @class */ (function () {
      * @returns the animation promise.
      */
     AnimationManager.prototype.play = function (animation) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
         return __awaiter(this, void 0, void 0, function () {
-            var settings, _m;
-            return __generator(this, function (_o) {
-                switch (_o.label) {
+            var settings, _p;
+            return __generator(this, function (_q) {
+                switch (_q.label) {
                     case 0:
                         animation.played = animation.playWhenNoAnimation || this.animationsActive();
                         if (!animation.played) return [3 /*break*/, 2];
                         settings = animation.settings;
                         (_a = settings.animationStart) === null || _a === void 0 ? void 0 : _a.call(settings, animation);
                         (_b = settings.element) === null || _b === void 0 ? void 0 : _b.classList.add((_c = settings.animationClass) !== null && _c !== void 0 ? _c : 'bga-animations_animated');
-                        animation.settings = __assign(__assign({}, animation.settings), { duration: (_e = (_d = this.settings) === null || _d === void 0 ? void 0 : _d.duration) !== null && _e !== void 0 ? _e : 500, scale: (_g = (_f = this.zoomManager) === null || _f === void 0 ? void 0 : _f.zoom) !== null && _g !== void 0 ? _g : undefined });
-                        _m = animation;
+                        animation.settings = __assign(__assign({}, animation.settings), { duration: (_g = (_e = (_d = animation.settings) === null || _d === void 0 ? void 0 : _d.duration) !== null && _e !== void 0 ? _e : (_f = this.settings) === null || _f === void 0 ? void 0 : _f.duration) !== null && _g !== void 0 ? _g : 500, scale: (_j = (_h = this.zoomManager) === null || _h === void 0 ? void 0 : _h.zoom) !== null && _j !== void 0 ? _j : undefined });
+                        _p = animation;
                         return [4 /*yield*/, animation.animationFunction(this, animation)];
                     case 1:
-                        _m.result = _o.sent();
-                        (_j = (_h = animation.settings).animationEnd) === null || _j === void 0 ? void 0 : _j.call(_h, animation);
-                        (_k = settings.element) === null || _k === void 0 ? void 0 : _k.classList.remove((_l = settings.animationClass) !== null && _l !== void 0 ? _l : 'bga-animations_animated');
+                        _p.result = _q.sent();
+                        (_l = (_k = animation.settings).animationEnd) === null || _l === void 0 ? void 0 : _l.call(_k, animation);
+                        (_m = settings.element) === null || _m === void 0 ? void 0 : _m.classList.remove((_o = settings.animationClass) !== null && _o !== void 0 ? _o : 'bga-animations_animated');
                         return [3 /*break*/, 3];
                     case 2: return [2 /*return*/, Promise.resolve(animation)];
                     case 3: return [2 /*return*/];
@@ -482,10 +505,25 @@ var Die4 = /** @class */ (function () {
     return Die4;
 }());
 var Die6 = /** @class */ (function () {
-    function Die6() {
+    /**
+     *
+     * @param borderRadius the border radius, in %
+     */
+    function Die6(borderRadius) {
+        if (borderRadius === void 0) { borderRadius = 0; }
+        this.borderRadius = borderRadius;
         this.facesCount = 6;
-        this.dieTypeClass = 'bga-dice_die6';
     }
+    /**
+     * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.
+     *
+     * @param die the die informations
+     * @param element the die main Div element
+     */
+    Die6.prototype.setupDieDiv = function (die, element) {
+        element.classList.add('bga-dice_die6');
+        element.style.setProperty('--bga-dice_border-radius', "".concat(this.borderRadius, "%"));
+    };
     return Die6;
 }());
 /**
@@ -741,21 +779,19 @@ var DiceStock = /** @class */ (function () {
      * Remove a die from the stock.
      *
      * @param die die die to remove
-     * @param settings a `RemoveDieSettings` object
      */
-    DiceStock.prototype.removeDie = function (die, settings) {
+    DiceStock.prototype.removeDie = function (die) {
         if (this.contains(die) && this.element.contains(this.getDieElement(die))) {
-            this.manager.removeDie(die, settings);
+            this.manager.removeDie(die);
         }
-        this.dieRemoved(die, settings);
+        this.dieRemoved(die);
     };
     /**
      * Notify the stock that a die is removed.
      *
      * @param die the die to remove
-     * @param settings a `RemoveDieSettings` object
      */
-    DiceStock.prototype.dieRemoved = function (die, settings) {
+    DiceStock.prototype.dieRemoved = function (die) {
         var _this = this;
         var index = this.dice.findIndex(function (c) { return _this.manager.getId(c) == _this.manager.getId(die); });
         if (index !== -1) {
@@ -769,20 +805,18 @@ var DiceStock = /** @class */ (function () {
      * Remove a set of dice from the stock.
      *
      * @param dice the dice to remove
-     * @param settings a `RemoveDieSettings` object
      */
-    DiceStock.prototype.removeDice = function (dice, settings) {
+    DiceStock.prototype.removeDice = function (dice) {
         var _this = this;
-        dice.forEach(function (die) { return _this.removeDie(die, settings); });
+        dice.forEach(function (die) { return _this.removeDie(die); });
     };
     /**
      * Remove all dice from the stock.
-     * @param settings a `RemoveDiceettings` object
      */
-    DiceStock.prototype.removeAll = function (settings) {
+    DiceStock.prototype.removeAll = function () {
         var _this = this;
         var dice = this.getDice(); // use a copy of the array as we iterate and modify it at the same time
-        dice.forEach(function (die) { return _this.removeDie(die, settings); });
+        dice.forEach(function (die) { return _this.removeDie(die); });
     };
     /**
      * Set if the stock is selectable, and if yes if it can be multiple.
@@ -1015,6 +1049,71 @@ var DiceStock = /** @class */ (function () {
         var unselectableDiceClass = this.getUnselectableDieClass();
         var selectedDiceClass = this.getSelectedDieClass();
         dieElement.classList.remove(selectableDiceClass, unselectableDiceClass, selectedDiceClass);
+    };
+    DiceStock.prototype.addRollEffectToDieElement = function (die, element, effect, duration) {
+        var _a, _b;
+        switch (effect) {
+            case 'rollIn':
+                this.manager.animationManager.play(new BgaSlideAnimation({
+                    element: element,
+                    duration: duration,
+                    fromDelta: {
+                        x: 0,
+                        y: ((_a = this.manager.getDieType(die).size) !== null && _a !== void 0 ? _a : 50) * 5,
+                    }
+                }));
+                break;
+            case 'rollOutPauseAndBack':
+                this.manager.animationManager.play(new BgaCumulatedAnimation({ animations: [
+                        new BgaSlideToAnimation({
+                            element: element,
+                            duration: duration,
+                            fromDelta: {
+                                x: 0,
+                                y: ((_b = this.manager.getDieType(die).size) !== null && _b !== void 0 ? _b : 50) * -5,
+                            }
+                        }),
+                        new BgaPauseAnimation({}),
+                        new BgaSlideToAnimation({
+                            duration: 250,
+                            element: element,
+                            fromDelta: {
+                                x: 0,
+                                y: 0,
+                            }
+                        }),
+                    ] }));
+                break;
+            case 'turn':
+                this.manager.animationManager.play(new BgaPauseAnimation({ duration: duration }));
+                break;
+        }
+    };
+    DiceStock.prototype.rollDice = function (dice, settings) {
+        var _this = this;
+        dice.forEach(function (die) { return _this.rollDie(die, settings); });
+    };
+    DiceStock.prototype.rollDie = function (die, settings) {
+        var _a, _b;
+        var div = this.getDieElement(die);
+        var faces = div.querySelector('.bga-dice_die-faces');
+        faces.style.setProperty('--roll-duration', "0");
+        faces.clientWidth;
+        faces.dataset.roll = "";
+        faces.clientWidth;
+        var rollEffect = (_a = settings === null || settings === void 0 ? void 0 : settings.effect) !== null && _a !== void 0 ? _a : 'rollIn';
+        var animate = this.manager.animationManager.animationsActive() && rollEffect !== 'none';
+        var duration = (_b = settings === null || settings === void 0 ? void 0 : settings.duration) !== null && _b !== void 0 ? _b : 1000;
+        if (animate) {
+            if (Array.isArray(duration)) {
+                var diff = Math.abs(duration[1] - duration[0]);
+                duration = Math.min.apply(Math, duration) + Math.floor(Math.random() * diff);
+            }
+            this.addRollEffectToDieElement(die, div, rollEffect, duration);
+        }
+        faces.style.setProperty('--roll-duration', "".concat(animate ? duration : 0, "ms"));
+        faces.clientWidth;
+        faces.dataset.roll = "".concat(Math.floor(Math.random() * 6) + 1);
     };
     return DiceStock;
 }());
@@ -1289,6 +1388,9 @@ var DiceManager = /** @class */ (function () {
     DiceManager.prototype.setDieType = function (type, dieType) {
         this.registeredDieTypes[type] = dieType;
     };
+    DiceManager.prototype.getDieType = function (die) {
+        return this.registeredDieTypes[die.type];
+    };
     DiceManager.prototype.getId = function (die) {
         return "bga-die-".concat(die.type, "-").concat(die.id);
     };
@@ -1304,7 +1406,7 @@ var DiceManager = /** @class */ (function () {
         }
         var element = document.createElement("div");
         element.id = id;
-        element.classList.add('bga-dice_die', dieType.dieTypeClass);
+        element.classList.add('bga-dice_die');
         element.dataset.visibleFace = '' + die.face;
         element.style.setProperty('--size', "".concat((_a = dieType.size) !== null && _a !== void 0 ? _a : 50, "px"));
         var dieFaces = document.createElement("div");
@@ -1313,6 +1415,7 @@ var DiceManager = /** @class */ (function () {
         var facesElements = [];
         for (var i = 1; i <= dieType.facesCount; i++) {
             facesElements[i] = document.createElement("div");
+            facesElements[i].id = "".concat(id, "-face-").concat(i);
             facesElements[i].classList.add('bga-dice_die-face');
             facesElements[i].dataset.face = '' + i;
             dieFaces.appendChild(facesElements[i]);
@@ -1339,9 +1442,8 @@ var DiceManager = /** @class */ (function () {
      * Remove a die.
      *
      * @param die the die to remove
-     * @param settings a `RemoveDieSettings` object
      */
-    DiceManager.prototype.removeDie = function (die, settings) {
+    DiceManager.prototype.removeDie = function (die) {
         var _a;
         var id = this.getId(die);
         var div = document.getElementById(id);
@@ -1351,7 +1453,7 @@ var DiceManager = /** @class */ (function () {
         div.id = "deleted".concat(id);
         div.remove();
         // if the die is in a stock, notify the stock about removal
-        (_a = this.getDieStock(die)) === null || _a === void 0 ? void 0 : _a.dieRemoved(die, settings);
+        (_a = this.getDieStock(die)) === null || _a === void 0 ? void 0 : _a.dieRemoved(die);
         return true;
     };
     /**

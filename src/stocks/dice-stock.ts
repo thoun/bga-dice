@@ -50,11 +50,21 @@ interface AddDieSettings {
      */
     selectable?: boolean;
 }
+interface RollDieSettings {    
+    /**
+     * Set the dice roll effect. Default 'rollIn';
+     */
+    effect?: DiceRollEffect;
 
-interface RemoveDieSettings {
+    /**
+     * Duration. A number (if fixed), or an array of 2, and it will be a random value between the 2 values.
+     * Default 1000.
+     */
+    duration: number | number[];
 }
 
 type DiceSelectionMode = 'none' | 'single' | 'multiple';
+type DiceRollEffect = 'rollIn' | 'rollInBump' | 'rollOutPauseAndBack' | 'rollOutBumpPauseAndBack' | 'turn' | 'none';
 
 /**
  * The abstract stock. It shouldn't be used directly, use stocks that extends it.
@@ -331,22 +341,20 @@ class DiceStock {
      * Remove a die from the stock.
      * 
      * @param die die die to remove
-     * @param settings a `RemoveDieSettings` object
      */
-    public removeDie(die: Die, settings?: RemoveDieSettings) {
+    public removeDie(die: Die) {
         if (this.contains(die) && this.element.contains(this.getDieElement(die))) {
-            this.manager.removeDie(die, settings);
+            this.manager.removeDie(die);
         }
-        this.dieRemoved(die, settings);
+        this.dieRemoved(die);
     }
 
     /**
      * Notify the stock that a die is removed.
      * 
      * @param die the die to remove
-     * @param settings a `RemoveDieSettings` object
      */
-    public dieRemoved(die: Die, settings?: RemoveDieSettings) {
+    public dieRemoved(die: Die) {
         const index = this.dice.findIndex(c => this.manager.getId(c) == this.manager.getId(die));
         if (index !== -1) {
             this.dice.splice(index, 1);
@@ -360,19 +368,17 @@ class DiceStock {
      * Remove a set of dice from the stock.
      * 
      * @param dice the dice to remove
-     * @param settings a `RemoveDieSettings` object
      */
-    public removeDice(dice: Die[], settings?: RemoveDieSettings) {
-        dice.forEach(die => this.removeDie(die, settings));
+    public removeDice(dice: Die[]) {
+        dice.forEach(die => this.removeDie(die));
     }
 
     /**
      * Remove all dice from the stock.
-     * @param settings a `RemoveDiceettings` object
      */
-    public removeAll(settings?: RemoveDieSettings) {
+    public removeAll() {
         const dice = this.getDice(); // use a copy of the array as we iterate and modify it at the same time
-        dice.forEach(die => this.removeDie(die, settings));
+        dice.forEach(die => this.removeDie(die));
     }
 
     /**
@@ -607,5 +613,74 @@ class DiceStock {
         const selectedDiceClass = this.getSelectedDieClass();
 
         dieElement.classList.remove(selectableDiceClass, unselectableDiceClass, selectedDiceClass);
+    }
+
+    protected addRollEffectToDieElement(die: Die, element: HTMLElement, effect: DiceRollEffect, duration: number) {
+        switch (effect) {
+            case 'rollIn':
+                this.manager.animationManager.play(new BgaSlideAnimation({
+                    element,
+                    duration,
+                    fromDelta: {
+                        x: 0,
+                        y: (this.manager.getDieType(die).size ?? 50) * 5,
+                    }
+                }));
+                break;
+            case 'rollOutPauseAndBack':
+                this.manager.animationManager.play(new BgaCumulatedAnimation({ animations: [
+                    new BgaSlideToAnimation({
+                        element,
+                        duration,
+                        fromDelta: {
+                            x: 0,
+                            y: (this.manager.getDieType(die).size ?? 50) * -5,
+                        }
+                    }),
+                    new BgaPauseAnimation({}),
+                    new BgaSlideToAnimation({
+                        duration: 250,
+                        element,
+                        fromDelta: {
+                            x: 0,
+                            y: 0,
+                        }
+                    }),
+                    
+                ]}));
+                break;
+            case 'turn':
+                this.manager.animationManager.play(new BgaPauseAnimation({ duration }));
+                break;
+        }
+    }
+
+    public rollDice(dice: Die[], settings?: RollDieSettings) {
+        dice.forEach(die => this.rollDie(die, settings));
+    }
+
+    public rollDie(die: Die, settings?: RollDieSettings) {
+        const div = this.getDieElement(die);
+        const faces = div.querySelector('.bga-dice_die-faces') as HTMLElement;
+
+        faces.style.setProperty('--roll-duration', `0`);
+        faces.clientWidth;
+        faces.dataset.roll = ``;
+        faces.clientWidth;
+
+        const rollEffect = settings?.effect ?? 'rollIn';
+        const animate = this.manager.animationManager.animationsActive() && rollEffect !== 'none';
+        let duration = settings?.duration ?? 1000;
+        if (animate) {
+            if (Array.isArray(duration)) {
+                const diff = Math.abs(duration[1] - duration[0]);
+                duration = Math.min(...duration) + Math.floor(Math.random() * diff);
+            }
+            this.addRollEffectToDieElement(die, div, rollEffect, duration);
+        }
+
+        faces.style.setProperty('--roll-duration', `${animate ? duration : 0}ms`);
+        faces.clientWidth;
+        faces.dataset.roll = `${Math.floor(Math.random() * 6) + 1}`;
     }
 }

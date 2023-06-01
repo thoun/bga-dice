@@ -6,7 +6,6 @@ interface Die {
 
 interface DieType {
     facesCount: number;
-    dieTypeClass: string;
     size?: number;
 
     /**
@@ -15,7 +14,7 @@ interface DieType {
      * @param die the die informations
      * @param element the die main Div element
      */
-    setupDieDiv?: (die: Die, element: HTMLDivElement) => void;
+    setupDieDiv: (die: Die, element: HTMLDivElement) => void;
 
     /**
      * Allow to populate a face div of the die. You can set classes or dataset to show the correct die face.

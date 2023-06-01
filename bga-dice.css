@@ -5,6 +5,7 @@ body > .bga-dice_die {
 }
 
 .bga-dice_die {
+  --roll-duration: 1000ms;
   flex-shrink: 0;
   position: relative;
   width: var(--size);
@@ -14,8 +15,11 @@ body > .bga-dice_die {
   transform-origin: center center;
 }
 .bga-dice_die .bga-dice_die-faces {
+  transform-origin: center center;
+  transform-style: preserve-3d;
   position: relative;
   display: inline-block;
+  transform: rotate3d(1, 1, 1, -720deg);
 }
 .bga-dice_die .bga-dice_die-faces .bga-dice_die-face {
   position: absolute;
@@ -42,165 +46,58 @@ body > .bga-dice_die {
 
 .bga-dice_die6 {
   --half-size: calc(var(--size) / 2);
-  transform-origin: center center;
   transform: translateZ(var(--half-size));
 }
 .bga-dice_die6 .bga-dice_die-faces {
-  transform-origin: center center;
-  transform-style: preserve-3d;
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
   height: 100%;
   width: 100%;
+  transition: transform var(--roll-duration) ease-out;
+}
+.bga-dice_die6 .bga-dice_die-faces[data-roll="1"] {
+  transform: rotate3d(0, 0, 0, 0deg);
+}
+.bga-dice_die6 .bga-dice_die-faces[data-roll="2"] {
+  transform: rotate3d(1, 0, 0, 90deg);
+}
+.bga-dice_die6 .bga-dice_die-faces[data-roll="3"] {
+  transform: rotate3d(0, -1, 0, 90deg);
+}
+.bga-dice_die6 .bga-dice_die-faces[data-roll="4"] {
+  transform: rotate3d(0, 1, 0, 90deg);
+}
+.bga-dice_die6 .bga-dice_die-faces[data-roll="5"] {
+  transform: rotate3d(-1, 0, 0, 90deg);
+}
+.bga-dice_die6 .bga-dice_die-faces[data-roll="6"] {
+  transform: rotate3d(0, 1, 0, 180deg);
 }
 .bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face {
   height: 100%;
   width: 100%;
   grid-column: 1;
   grid-row: 1;
+  border-radius: var(--bga-dice_border-radius);
 }
-.bga-dice_die6 .bga-dice_die-face[data-face="1"] {
+.bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face[data-face="1"] {
   transform: rotate3d(0, 0, 0, 90deg) translateZ(var(--half-size));
 }
-.bga-dice_die6 .bga-dice_die-face[data-face="2"] {
+.bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face[data-face="2"] {
   transform: rotate3d(-1, 0, 0, 90deg) translateZ(var(--half-size));
 }
-.bga-dice_die6 .bga-dice_die-face[data-face="3"] {
+.bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face[data-face="3"] {
   transform: rotate3d(0, 1, 0, 90deg) translateZ(var(--half-size));
 }
-.bga-dice_die6 .bga-dice_die-face[data-face="4"] {
+.bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face[data-face="4"] {
   transform: rotate3d(0, -1, 0, 90deg) translateZ(var(--half-size));
 }
-.bga-dice_die6 .bga-dice_die-face[data-face="5"] {
+.bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face[data-face="5"] {
   transform: rotate3d(1, 0, 0, 90deg) translateZ(var(--half-size));
 }
-.bga-dice_die6 .bga-dice_die-face[data-face="6"] {
+.bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face[data-face="6"] {
   transform: rotate3d(1, 0, 0, 180deg) translateZ(var(--half-size));
-}
-
-[data-roll-type=even] {
-  transition: transform 0.9s ease-out;
-}
-
-[data-roll-type="-"] {
-  transition: transform 0;
-}
-
-[data-roll-type=change] {
-  transition: transform 0.5s ease-in-out;
-}
-
-[data-roll-type=even] {
-  transition: transform 0.9s ease-out;
-}
-
-[data-roll-type=odd] {
-  transition: transform 1.1s ease-out;
-}
-
-[data-roll-type="-"] {
-  transition: transform 0;
-}
-
-[data-roll-type=change] {
-  transition: transform 0.5s ease-in-out;
-}
-
-[data-roll-type=even][data-roll="1"] {
-  transform: rotateX(360deg) rotateY(720deg) rotateZ(360deg);
-}
-
-[data-roll-type=even][data-roll="2"] {
-  transform: rotateX(450deg) rotateY(720deg) rotateZ(360deg);
-}
-
-[data-roll-type=even][data-roll="3"] {
-  transform: rotateX(360deg) rotateY(630deg) rotateZ(360deg);
-}
-
-[data-roll-type=even][data-roll="4"] {
-  transform: rotateX(360deg) rotateY(810deg) rotateZ(360deg);
-}
-
-[data-roll-type=even][data-roll="5"] {
-  transform: rotateX(270deg) rotateY(720deg) rotateZ(360deg);
-}
-
-[data-roll-type=even][data-roll="6"] {
-  transform: rotateX(360deg) rotateY(900deg) rotateZ(540deg);
-}
-
-[data-roll-type=odd][data-roll="1"] {
-  transform: rotateX(-360deg) rotateY(-720deg) rotateZ(-360deg);
-}
-
-[data-roll-type=odd][data-roll="2"] {
-  transform: rotateX(-270deg) rotateY(-720deg) rotateZ(-360deg);
-}
-
-[data-roll-type=odd][data-roll="3"] {
-  transform: rotateX(-360deg) rotateY(-810deg) rotateZ(-360deg);
-}
-
-[data-roll-type=odd][data-roll="4"] {
-  transform: rotateX(-360deg) rotateY(-630deg) rotateZ(-360deg);
-}
-
-[data-roll-type=odd][data-roll="5"] {
-  transform: rotateX(-450deg) rotateY(-720deg) rotateZ(-360deg);
-}
-
-[data-roll-type=odd][data-roll="6"] {
-  transform: rotateX(-360deg) rotateY(-900deg) rotateZ(-540deg);
-}
-
-[data-roll-type="-"][data-roll="1"] {
-  transform: rotateX(360deg) rotateY(720deg) rotateZ(360deg);
-}
-
-[data-roll-type="-"][data-roll="2"] {
-  transform: rotateX(450deg) rotateY(720deg) rotateZ(360deg);
-}
-
-[data-roll-type="-"][data-roll="3"] {
-  transform: rotateX(360deg) rotateY(630deg) rotateZ(360deg);
-}
-
-[data-roll-type="-"][data-roll="4"] {
-  transform: rotateX(360deg) rotateY(810deg) rotateZ(360deg);
-}
-
-[data-roll-type="-"][data-roll="5"] {
-  transform: rotateX(270deg) rotateY(720deg) rotateZ(360deg);
-}
-
-[data-roll-type="-"][data-roll="6"] {
-  transform: rotateX(360deg) rotateY(900deg) rotateZ(540deg);
-}
-
-[data-roll-type=change][data-roll="1"] {
-  transform: rotateX(360deg) rotateY(720deg) rotateZ(360deg);
-}
-
-[data-roll-type=change][data-roll="2"] {
-  transform: rotateX(450deg) rotateY(720deg) rotateZ(360deg);
-}
-
-[data-roll-type=change][data-roll="3"] {
-  transform: rotateX(360deg) rotateY(630deg) rotateZ(360deg);
-}
-
-[data-roll-type=change][data-roll="4"] {
-  transform: rotateX(360deg) rotateY(810deg) rotateZ(360deg);
-}
-
-[data-roll-type=change][data-roll="5"] {
-  transform: rotateX(270deg) rotateY(720deg) rotateZ(360deg);
-}
-
-[data-roll-type=change][data-roll="6"] {
-  transform: rotateX(360deg) rotateY(900deg) rotateZ(540deg);
 }
 
 .bga-dice_die-stock {

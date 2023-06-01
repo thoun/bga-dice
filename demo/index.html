@@ -16,78 +16,18 @@
         <div class="block">
             A line of visible dice (LineStock). See all existing stocks in the other pages of the demo (top menu).
             <br>
-            <button onclick="roll()">roll</button>
+            Roll effect : <select id="roll-effect">
+                <option value="rollIn" selected>rollIn</option>
+                <!--<option value="rollInBump">rollInBump</option>-->
+                <option value="rollOutPauseAndBack">rollOutPauseAndBack</option>
+                <!--<option value="rollOutBumpPauseAndBack">rollOutBumpPauseAndBack</option>-->
+                <option value="turn">turn</option>
+                <option value="none">none</option>
+            </select>
+            <button onclick="roll(document.getElementById('roll-effect').value)">roll</button>
             <br><br>
 
             <div id="line-stock"></div>
-        </div>
-
-        <div class="block">
-        
-            <div id="dice2" class="dice dice2" data-dice-id="2" data-dice-value="2" data-rolled="false"
-                style="margin-left: 3px; z-index: unset; top: unset; left: unset; position: relative;">
-                <div class="die-list" data-roll="2" data-roll-type="-">
-                    <div class="die-item black side1" data-side="1"></div>
-                    <div class="die-item black side2" data-side="2"></div>
-                    <div class="die-item black side3" data-side="3"></div>
-                    <div class="die-item black side4" data-side="4"></div>
-                    <div class="die-item black side5" data-side="5"></div>
-                    <div class="die-item black side6" data-side="6"></div>
-                </div>
-            </div>
-            <div id="dice1" class="dice dice3" data-dice-id="1" data-dice-value="3" data-rolled="false">
-                <div class="die-list" data-roll="3" data-roll-type="-">
-                    <div class="die-item black side1" data-side="1"></div>
-                    <div class="die-item black side2" data-side="2"></div>
-                    <div class="die-item black side3" data-side="3"></div>
-                    <div class="die-item black side4" data-side="4"></div>
-                    <div class="die-item black side5" data-side="5"></div>
-                    <div class="die-item black side6" data-side="6"></div>
-                </div>
-            </div>
-            <div id="dice4" class="dice dice3" data-dice-id="4" data-dice-value="3" data-rolled="false">
-                <div class="die-list" data-roll="3" data-roll-type="-">
-                    <div class="die-item black side1" data-side="1"></div>
-                    <div class="die-item black side2" data-side="2"></div>
-                    <div class="die-item black side3" data-side="3"></div>
-                    <div class="die-item black side4" data-side="4"></div>
-                    <div class="die-item black side5" data-side="5"></div>
-                    <div class="die-item black side6" data-side="6"></div>
-                </div>
-            </div>
-            <div id="dice3" class="dice dice4" data-dice-id="3" data-dice-value="4" data-rolled="false">
-                <div class="die-list" data-roll="4" data-roll-type="-">
-                    <div class="die-item black side1" data-side="1"></div>
-                    <div class="die-item black side2" data-side="2"></div>
-                    <div class="die-item black side3" data-side="3"></div>
-                    <div class="die-item black side4" data-side="4"></div>
-                    <div class="die-item black side5" data-side="5"></div>
-                    <div class="die-item black side6" data-side="6"></div>
-                </div>
-            </div>
-            <div id="dice6" class="dice dice4" data-dice-id="6" data-dice-value="4" data-rolled="false">
-                <div class="die-list" data-roll="4" data-roll-type="-">
-                    <div class="die-item black side1" data-side="1"></div>
-                    <div class="die-item black side2" data-side="2"></div>
-                    <div class="die-item black side3" data-side="3"></div>
-                    <div class="die-item black side4" data-side="4"></div>
-                    <div class="die-item black side5" data-side="5"></div>
-                    <div class="die-item black side6" data-side="6"></div>
-                </div>
-            </div>
-            <div id="dice5" class="dice dice6" data-dice-id="5" data-dice-value="6" data-rolled="false"
-                style="margin-left: 3px; z-index: unset; top: unset; left: unset; position: relative;">
-                <div class="die-list" data-roll="6" data-roll-type="-">
-                    <div class="die-item black side1" data-side="1"></div>
-                    <div class="die-item black side2" data-side="2"></div>
-                    <div class="die-item black side3" data-side="3"></div>
-                    <div class="die-item black side4" data-side="4"></div>
-                    <div class="die-item black side5" data-side="5"></div>
-                    <div class="die-item black side6" data-side="6"></div>
-                </div>
-            </div>
-        </div>
-
         </div>
 
         <script>
