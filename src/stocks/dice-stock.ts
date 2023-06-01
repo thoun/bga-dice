@@ -621,6 +621,7 @@ class DiceStock {
                 this.manager.animationManager.play(new BgaSlideAnimation({
                     element,
                     duration,
+                    transitionTimingFunction: 'ease-out',
                     fromDelta: {
                         x: 0,
                         y: (this.manager.getDieType(die).size ?? 50) * 5,
@@ -632,6 +633,7 @@ class DiceStock {
                     new BgaSlideToAnimation({
                         element,
                         duration,
+                        transitionTimingFunction: 'ease-out',
                         fromDelta: {
                             x: 0,
                             y: (this.manager.getDieType(die).size ?? 50) * -5,
@@ -640,13 +642,13 @@ class DiceStock {
                     new BgaPauseAnimation({}),
                     new BgaSlideToAnimation({
                         duration: 250,
+                        transitionTimingFunction: 'ease-out',
                         element,
                         fromDelta: {
                             x: 0,
                             y: 0,
                         }
                     }),
-                    
                 ]}));
                 break;
             case 'turn':

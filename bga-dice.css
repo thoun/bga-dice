@@ -20,28 +20,13 @@ body > .bga-dice_die {
   position: relative;
   display: inline-block;
   transform: rotate3d(1, 1, 1, -720deg);
+  transition: transform var(--roll-duration) ease-out;
 }
 .bga-dice_die .bga-dice_die-faces .bga-dice_die-face {
   position: absolute;
   width: var(--size);
   height: var(--size);
   display: inline-block;
-}
-.bga-dice_die[data-rolled=true] {
-  animation: rolled-dice 1s forwards linear;
-  transform: translateY(calc(var(--size) * -5));
-}
-@keyframes rolled-dice {
-  /* TODO find a better rebound effect animation
-   0% {  transform: translateY(calc(var(--size) * -5)) translateZ(calc(var(--size) * 5)); }
-  20% { transform: translateY(calc(var(--size) * -4)) translateZ(0)}
-  40% { transform: translateY(calc(var(--size) * -3)) translateZ(calc(var(--size) * 5)); }
-  60% { transform: translateY(calc(var(--size) * -2)) translateZ(0); }
-  80% { transform: translateY(calc(var(--size) * -1)) translateZ(calc(var(--size) * 5)); }
-  */
-  100% {
-    transform: initial;
-  }
 }
 
 .bga-dice_die6 {
@@ -54,7 +39,6 @@ body > .bga-dice_die {
   grid-template-rows: 1fr;
   height: 100%;
   width: 100%;
-  transition: transform var(--roll-duration) ease-out;
 }
 .bga-dice_die6 .bga-dice_die-faces[data-roll="1"] {
   transform: rotate3d(0, 0, 0, 0deg);

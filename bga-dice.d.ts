@@ -12,6 +12,10 @@ interface BgaAnimationSettings {
      */
     duration?: number;
     /**
+     * The animation CSS timing function, 'linear', 'ease-in-out' (default: linear).
+     */
+    transitionTimingFunction?: string;
+    /**
      * The cumulated scale of the element to animate (default: 1).
      */
     scale?: number;
@@ -129,7 +133,7 @@ declare class BgaPauseAnimation<BgaAnimation> extends BgaAnimation<any> {
     constructor(settings: BgaAnimation);
 }
 /**
- * Linear slide of the element from origin to destination.
+ * Slide of the element from origin to destination.
  *
  * @param animationManager the animation manager
  * @param animation a `BgaAnimation` object
@@ -140,7 +144,7 @@ declare class BgaSlideAnimation<BgaAnimationWithAttachAndOriginSettings> extends
     constructor(settings: BgaAnimationWithAttachAndOriginSettings);
 }
 /**
- * Linear slide of the element from origin to destination.
+ * Slide of the element from destination to origin.
  *
  * @param animationManager the animation manager
  * @param animation a `BgaAnimation` object

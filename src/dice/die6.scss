@@ -9,7 +9,6 @@
     grid-template-rows: 1fr;
     height: 100%;
     width: 100%;
-    transition: transform var(--roll-duration) ease-out;
 
     &[data-roll="1"] {
         transform: rotate3d(0, 0, 0, 0deg);
