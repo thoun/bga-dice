@@ -24,6 +24,11 @@ body > .bga-dice_die {
     display: inline-block;
     transform: rotate3d(1, 1, 1, -720deg);   
     transition: transform var(--roll-duration) ease-out; 
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    height: 100%;
+    width: 100%;
 
     .bga-dice_die-face {
       position: absolute;
@@ -31,6 +36,11 @@ body > .bga-dice_die {
       height: var(--size);
       display: inline-block;
       //backface-visibility: hidden;
+      
+      height: 100%;
+      width: 100%;
+      grid-column: 1;
+      grid-row: 1;
     }
   }
 }

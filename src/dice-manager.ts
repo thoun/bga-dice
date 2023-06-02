@@ -4,7 +4,7 @@ interface DiceManagerSettings {
      */
     animationManager?: AnimationManager;
 
-    dieTypes?: {[dieType: number | string]: DieType };
+    dieTypes?: {[dieType: number | string]: BgaDieType };
 
     /**
      * Perspective effect on Stock elements. Default 1000px. Can be overriden on each stock.
@@ -32,7 +32,7 @@ class DiceManager {
 
     private stocks: DiceStock[] = [];
 
-    private registeredDieTypes: DieType[] = [];
+    private registeredDieTypes: BgaDieType[] = [];
 
     /**
      * @param game the BGA game class, usually it will be `this`
@@ -59,26 +59,26 @@ class DiceManager {
         this.stocks.push(stock);
     }
     
-    public setDieType(type: number | string, dieType: DieType) {
+    public setDieType(type: number | string, dieType: BgaDieType) {
         this.registeredDieTypes[type] = dieType;
     }
     
-    public getDieType(die: Die): DieType {
+    public getDieType(die: BgaDie): BgaDieType {
         return this.registeredDieTypes[die.type];
     }
 
-    public getId(die: Die): string {
+    public getId(die: BgaDie): string {
         return `bga-die-${die.type}-${die.id}`;
     }
 
-    public createDieElement(die: Die): HTMLDivElement {
+    public createDieElement(die: BgaDie): HTMLDivElement {
         const id = this.getId(die);
 
         if (this.getDieElement(die)) {
             throw new Error(`This die already exists ${JSON.stringify(die)}`);
         }
 
-        const dieType: DieType = this.registeredDieTypes[die.type];
+        const dieType: BgaDieType = this.registeredDieTypes[die.type];
         if (!dieType) {
             throw new Error(`This die type doesn't exists ${die.type}`);
         }
@@ -86,11 +86,11 @@ class DiceManager {
         const element = document.createElement("div");
         element.id = id;
         element.classList.add('bga-dice_die');
-        element.dataset.visibleFace = ''+die.face;
         element.style.setProperty('--size', `${dieType.size ?? 50}px`);
         
         const dieFaces = document.createElement("div");
         dieFaces.classList.add('bga-dice_die-faces');
+        dieFaces.dataset.visibleFace = ''+die.face;
         element.appendChild(dieFaces);
         
         const facesElements = [];
@@ -120,7 +120,7 @@ class DiceManager {
      * @param die the die informations
      * @return the HTML element of an existing die
      */
-    public getDieElement(die: Die): HTMLElement {
+    public getDieElement(die: BgaDie): HTMLElement {
         return document.getElementById(this.getId(die));
     }
 
@@ -129,7 +129,7 @@ class DiceManager {
      * 
      * @param die the die to remove
      */
-    public removeDie(die: Die) {
+    public removeDie(die: BgaDie) {
         const id = this.getId(die);
         const div = document.getElementById(id);
         if (!div) {
@@ -151,7 +151,7 @@ class DiceManager {
      * @param die the die informations
      * @return the stock containing the die
      */
-    public getDieStock(die: Die): DiceStock {
+    public getDieStock(die: BgaDie): DiceStock {
         return this.stocks.find(stock => stock.contains(die));
     }
 
@@ -160,7 +160,7 @@ class DiceManager {
      * 
      * @param die the die informations
      */
-    public updateDieInformations(die: Die, updateData?: boolean): void {
+    public updateDieInformations(die: BgaDie, updateData?: boolean): void {
         const div = this.getDieElement(die);
         div.dataset.visibleFace = ''+die.face;
 

@@ -12,7 +12,7 @@ interface SlotStockSettings extends LineStockSettings {
     /**
      * How to place the die on a slot automatically
      */
-    mapDieToSlot?: (die: Die) => SlotId;
+    mapDieToSlot?: (die: BgaDie) => SlotId;
 }
 
 type SlotId = number | string;
@@ -31,7 +31,7 @@ class SlotDiceStock extends LineDiceStock {
     protected slotsIds: SlotId[] = [];
     protected slots: HTMLDivElement[] = [];
     protected slotClasses: string[];
-    protected mapDieToSlot?: (die: Die) => SlotId;
+    protected mapDieToSlot?: (die: BgaDie) => SlotId;
 
     /**
      * @param manager the die manager  
@@ -65,7 +65,7 @@ class SlotDiceStock extends LineDiceStock {
      * @param settings a `AddDieToSlotSettings` object
      * @returns the promise when the animation is done (true if it was animated, false if it wasn't)
      */
-    public addDie(die: Die, animation?: DieAnimation, settings?: AddDieToSlotSettings): Promise<boolean> {
+    public addDie(die: BgaDie, animation?: DieAnimation, settings?: AddDieToSlotSettings): Promise<boolean> {
         const slotId = settings?.slot ?? this.mapDieToSlot?.(die);
         if (slotId === undefined) {
             throw new Error(`Impossible to add die to slot : no SlotId. Add slotId to settings or set mapDieToSlot to SlotDie constructor.`);
@@ -100,7 +100,7 @@ class SlotDiceStock extends LineDiceStock {
         });
     }
 
-    protected canAddDie(die: Die, settings?: AddDieToSlotSettings) {
+    protected canAddDie(die: BgaDie, settings?: AddDieToSlotSettings) {
         if (!this.contains(die)) {
             return true;
         } else {
@@ -116,7 +116,7 @@ class SlotDiceStock extends LineDiceStock {
      * @param dice the dice to swap
      * @param settings for `updateInformations` and `selectable`
      */
-    public swapDice(dice: Die[], settings?: AddDieSettings) {
+    public swapDice(dice: BgaDie[], settings?: AddDieSettings) {
         if (!this.mapDieToSlot) {
             throw new Error('You need to define SlotStock.mapDieToSlot to use SlotStock.swapDice');
         }

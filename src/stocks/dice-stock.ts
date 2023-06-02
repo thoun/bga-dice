@@ -70,8 +70,8 @@ type DiceRollEffect = 'rollIn' | 'rollInBump' | 'rollOutPauseAndBack' | 'rollOut
  * The abstract stock. It shouldn't be used directly, use stocks that extends it.
  */
 class DiceStock {
-    protected dice: Die[] = [];
-    protected selectedDice: Die[] = [];
+    protected dice: BgaDie[] = [];
+    protected selectedDice: BgaDie[] = [];
     protected selectionMode: DiceSelectionMode = 'none';
     protected sort?: SortFunction; 
 
@@ -81,14 +81,14 @@ class DiceStock {
      * selection: the selected dice of the stock  
      * lastChange: the last change on selection die (can be selected or unselected)
      */
-    public onSelectionChange?: (selection: Die[], lastChange: Die | null) => void;
+    public onSelectionChange?: (selection: BgaDie[], lastChange: BgaDie | null) => void;
 
     /**
      * Called when selection change. Returns the clicked die.
      * 
      * die: the clicked die (can be selected or unselected)
      */
-    public onDieClick?: (die: Die) => void;
+    public onDieClick?: (die: BgaDie) => void;
 
     /**
      * @param manager the die manager  
@@ -107,7 +107,7 @@ class DiceStock {
     /**
      * @returns the dice on the stock
      */
-    public getDice(): Die[] {
+    public getDice(): BgaDie[] {
         return this.dice.slice();
     }
 
@@ -121,14 +121,14 @@ class DiceStock {
     /**
      * @returns the selected dice
      */
-    public getSelection(): Die[] {
+    public getSelection(): BgaDie[] {
         return this.selectedDice.slice();
     }
 
     /**
      * @returns the selected dice
      */
-    public isSelected(die: Die): boolean {
+    public isSelected(die: BgaDie): boolean {
         return this.selectedDice.some(c => this.manager.getId(c) == this.manager.getId(die));
     }
 
@@ -136,7 +136,7 @@ class DiceStock {
      * @param die a die  
      * @returns if the die is present in the stock
      */
-    public contains(die: Die): boolean {
+    public contains(die: BgaDie): boolean {
         return this.dice.some(c => this.manager.getId(c) == this.manager.getId(die));
     }
 
@@ -144,7 +144,7 @@ class DiceStock {
      * @param die a die in the stock
      * @returns the HTML element generated for the die
      */
-    public getDieElement(die: Die): HTMLElement {
+    public getDieElement(die: BgaDie): HTMLElement {
         return this.manager.getDieElement(die);
     }
 
@@ -155,7 +155,7 @@ class DiceStock {
      * @param settings the addDie settings
      * @returns if the die can be added
      */
-    protected canAddDie(die: Die, settings?: AddDieSettings) {
+    protected canAddDie(die: BgaDie, settings?: AddDieSettings) {
         return !this.contains(die);
     }
 
@@ -167,7 +167,7 @@ class DiceStock {
      * @param settings a `AddDiceettings` object
      * @returns the promise when the animation is done (true if it was animated, false if it wasn't)
      */
-    public addDie(die: Die, animation?: DieAnimation, settings?: AddDieSettings): Promise<boolean> {
+    public addDie(die: BgaDie, animation?: DieAnimation, settings?: AddDieSettings): Promise<boolean> {
         if (!this.canAddDie(die, settings)) {
             return Promise.resolve(false);
         }
@@ -219,7 +219,7 @@ class DiceStock {
         return promise;
     }
 
-    protected getNewDieIndex(die: Die): number | undefined {
+    protected getNewDieIndex(die: BgaDie): number | undefined {
         if (this.sort) {
             const otherDice = this.getDice();
             for (let i = 0; i<otherDice.length; i++) {
@@ -245,7 +245,7 @@ class DiceStock {
         }
     }
 
-    protected moveFromOtherStock(die: Die, dieElement: HTMLElement, animation: DieAnimation, settings?: AddDieSettings): Promise<boolean> {
+    protected moveFromOtherStock(die: BgaDie, dieElement: HTMLElement, animation: DieAnimation, settings?: AddDieSettings): Promise<boolean> {
         let promise: Promise<boolean>;
 
         const element = animation.fromStock.contains(die) ? this.manager.getDieElement(die) : animation.fromStock.element;
@@ -273,7 +273,7 @@ class DiceStock {
         return promise;
     }
 
-    protected moveFromElement(die: Die, dieElement: HTMLElement, animation: DieAnimation, settings?: AddDieSettings): Promise<boolean> {
+    protected moveFromElement(die: BgaDie, dieElement: HTMLElement, animation: DieAnimation, settings?: AddDieSettings): Promise<boolean> {
         let promise: Promise<boolean>;
 
         this.addDieElementToParent(dieElement, settings);
@@ -313,7 +313,7 @@ class DiceStock {
      * @param settings a `AddDiceettings` object
      * @param shift if number, the number of milliseconds between each die. if true, chain animations
      */
-    public async addDice(dice: Die[], animation?: DieAnimation, settings?: AddDieSettings, shift: number | boolean = false): Promise<boolean> {
+    public async addDice(dice: BgaDie[], animation?: DieAnimation, settings?: AddDieSettings, shift: number | boolean = false): Promise<boolean> {
         if (!this.manager.animationsActive()) {
             shift = false;
         }
@@ -342,7 +342,7 @@ class DiceStock {
      * 
      * @param die die die to remove
      */
-    public removeDie(die: Die) {
+    public removeDie(die: BgaDie) {
         if (this.contains(die) && this.element.contains(this.getDieElement(die))) {
             this.manager.removeDie(die);
         }
@@ -354,7 +354,7 @@ class DiceStock {
      * 
      * @param die the die to remove
      */
-    public dieRemoved(die: Die) {
+    public dieRemoved(die: BgaDie) {
         const index = this.dice.findIndex(c => this.manager.getId(c) == this.manager.getId(die));
         if (index !== -1) {
             this.dice.splice(index, 1);
@@ -369,7 +369,7 @@ class DiceStock {
      * 
      * @param dice the dice to remove
      */
-    public removeDice(dice: Die[]) {
+    public removeDice(dice: BgaDie[]) {
         dice.forEach(die => this.removeDie(die));
     }
 
@@ -388,7 +388,7 @@ class DiceStock {
      * @param selectionMode the selection mode
      * @param selectableDice the selectable dice (all if unset). Calls `setSelectableDice` method
      */
-    public setSelectionMode(selectionMode: DiceSelectionMode, selectableDice?: Die[]) {
+    public setSelectionMode(selectionMode: DiceSelectionMode, selectableDice?: BgaDie[]) {
         if (selectionMode !== this.selectionMode) {
             this.unselectAll(true);
         }
@@ -404,7 +404,7 @@ class DiceStock {
         }
     }
 
-    protected setSelectableDie(die: Die, selectable: boolean) {
+    protected setSelectableDie(die: BgaDie, selectable: boolean) {
         if (this.selectionMode === 'none') {
             return;
         }
@@ -430,7 +430,7 @@ class DiceStock {
      * 
      * @param selectableDice the selectable dice. If unset, all dice are marked selectable. Default unset.
      */
-    public setSelectableDice(selectableDice?: Die[]) {
+    public setSelectableDice(selectableDice?: BgaDie[]) {
         if (this.selectionMode === 'none') {
             return;
         }
@@ -447,7 +447,7 @@ class DiceStock {
      * 
      * @param die the die to select
      */
-    public selectDie(die: Die, silent: boolean = false) {
+    public selectDie(die: BgaDie, silent: boolean = false) {
         if (this.selectionMode == 'none') {
             return;
         }
@@ -477,7 +477,7 @@ class DiceStock {
      * 
      * @param die the die to unselect
      */
-    public unselectDie(die: Die, silent: boolean = false) {
+    public unselectDie(die: BgaDie, silent: boolean = false) {
         const element = this.getDieElement(die);      
         const selectedDiceClass = this.getSelectedDieClass();
         element.classList.remove(selectedDiceClass);
@@ -533,7 +533,7 @@ class DiceStock {
         });
     }
 
-    protected dieClick(die: Die) {
+    protected dieClick(die: BgaDie) {
         if (this.selectionMode != 'none') {
             const alreadySelected = this.selectedDice.some(c => this.manager.getId(c) == this.manager.getId(die));
 
@@ -603,7 +603,7 @@ class DiceStock {
         return this.settings?.selectedDieClass === undefined ? this.manager.getSelectedDieClass() : this.settings?.selectedDieClass;
     }
 
-    public removeSelectionClasses(die: Die) {        
+    public removeSelectionClasses(die: BgaDie) {        
         this.removeSelectionClassesFromElement(this.getDieElement(die));
     }
 
@@ -615,7 +615,7 @@ class DiceStock {
         dieElement.classList.remove(selectableDiceClass, unselectableDiceClass, selectedDiceClass);
     }
 
-    protected addRollEffectToDieElement(die: Die, element: HTMLElement, effect: DiceRollEffect, duration: number) {
+    protected addRollEffectToDieElement(die: BgaDie, element: HTMLElement, effect: DiceRollEffect, duration: number) {
         switch (effect) {
             case 'rollIn':
                 this.manager.animationManager.play(new BgaSlideAnimation({
@@ -657,17 +657,17 @@ class DiceStock {
         }
     }
 
-    public rollDice(dice: Die[], settings?: RollDieSettings) {
+    public rollDice(dice: BgaDie[], settings?: RollDieSettings) {
         dice.forEach(die => this.rollDie(die, settings));
     }
 
-    public rollDie(die: Die, settings?: RollDieSettings) {
+    public rollDie(die: BgaDie, settings?: RollDieSettings) {
         const div = this.getDieElement(die);
         const faces = div.querySelector('.bga-dice_die-faces') as HTMLElement;
 
         faces.style.setProperty('--roll-duration', `0`);
         faces.clientWidth;
-        faces.dataset.roll = ``;
+        faces.dataset.visibleFace = ``;
         faces.clientWidth;
 
         const rollEffect = settings?.effect ?? 'rollIn';
@@ -683,6 +683,6 @@ class DiceStock {
 
         faces.style.setProperty('--roll-duration', `${animate ? duration : 0}ms`);
         faces.clientWidth;
-        faces.dataset.roll = `${Math.floor(Math.random() * 6) + 1}`;
+        faces.dataset.visibleFace = `${Math.floor(Math.random() * 6) + 1}`;
     }
 }

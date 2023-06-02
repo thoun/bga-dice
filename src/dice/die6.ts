@@ -1,11 +1,22 @@
-class Die6 implements DieType {
+interface BgaDie6Settings {
+    /**
+     * The border radius, in %.
+     * Default 0.
+     */
+    borderRadius?: number;
+}
+
+class BgaDie6 implements BgaDieType {
     public facesCount: number = 6;
+    protected borderRadius: number;
 
     /**
+     * Create the die type.
      * 
-     * @param borderRadius the border radius, in %
+     * @param settings the die settings
      */
-    constructor(protected borderRadius: number = 0) {
+    constructor(protected settings?: BgaDie6Settings) {
+        this.borderRadius = settings?.borderRadius ?? 0;
     }
 
     /**
@@ -14,7 +25,7 @@ class Die6 implements DieType {
      * @param die the die informations
      * @param element the die main Div element
      */
-    setupDieDiv(die: Die, element: HTMLDivElement): void {
+    setupDieDiv(die: BgaDie, element: HTMLDivElement): void {
         element.classList.add('bga-dice_die6');
         element.style.setProperty('--bga-dice_border-radius', `${this.borderRadius}%`)
     }

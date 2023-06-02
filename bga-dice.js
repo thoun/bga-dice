@@ -499,22 +499,17 @@ function sortFunction() {
         return 0;
     };
 }
-var Die4 = /** @class */ (function () {
-    function Die4() {
-        this.facesCount = 4;
-        this.dieTypeClass = 'bga-dice_die4';
-    }
-    return Die4;
-}());
-var Die6 = /** @class */ (function () {
+var BgaDie4 = /** @class */ (function () {
     /**
+     * Create the die type.
      *
-     * @param borderRadius the border radius, in %
+     * @param settings the die settings
      */
-    function Die6(borderRadius) {
-        if (borderRadius === void 0) { borderRadius = 0; }
-        this.borderRadius = borderRadius;
-        this.facesCount = 6;
+    function BgaDie4(settings) {
+        var _a;
+        this.settings = settings;
+        this.facesCount = 4;
+        this.showValueOverlay = (_a = settings === null || settings === void 0 ? void 0 : settings.showValueOverlay) !== null && _a !== void 0 ? _a : false;
     }
     /**
      * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.
@@ -522,11 +517,34 @@ var Die6 = /** @class */ (function () {
      * @param die the die informations
      * @param element the die main Div element
      */
-    Die6.prototype.setupDieDiv = function (die, element) {
+    BgaDie4.prototype.setupDieDiv = function (die, element) {
+        element.classList.add('bga-dice_die4');
+    };
+    return BgaDie4;
+}());
+var BgaDie6 = /** @class */ (function () {
+    /**
+     * Create the die type.
+     *
+     * @param settings the die settings
+     */
+    function BgaDie6(settings) {
+        var _a;
+        this.settings = settings;
+        this.facesCount = 6;
+        this.borderRadius = (_a = settings === null || settings === void 0 ? void 0 : settings.borderRadius) !== null && _a !== void 0 ? _a : 0;
+    }
+    /**
+     * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.
+     *
+     * @param die the die informations
+     * @param element the die main Div element
+     */
+    BgaDie6.prototype.setupDieDiv = function (die, element) {
         element.classList.add('bga-dice_die6');
         element.style.setProperty('--bga-dice_border-radius', "".concat(this.borderRadius, "%"));
     };
-    return Die6;
+    return BgaDie6;
 }());
 /**
  * The abstract stock. It shouldn't be used directly, use stocks that extends it.
@@ -1104,7 +1122,7 @@ var DiceStock = /** @class */ (function () {
         var faces = div.querySelector('.bga-dice_die-faces');
         faces.style.setProperty('--roll-duration', "0");
         faces.clientWidth;
-        faces.dataset.roll = "";
+        faces.dataset.visibleFace = "";
         faces.clientWidth;
         var rollEffect = (_a = settings === null || settings === void 0 ? void 0 : settings.effect) !== null && _a !== void 0 ? _a : 'rollIn';
         var animate = this.manager.animationManager.animationsActive() && rollEffect !== 'none';
@@ -1118,7 +1136,7 @@ var DiceStock = /** @class */ (function () {
         }
         faces.style.setProperty('--roll-duration', "".concat(animate ? duration : 0, "ms"));
         faces.clientWidth;
-        faces.dataset.roll = "".concat(Math.floor(Math.random() * 6) + 1);
+        faces.dataset.visibleFace = "".concat(Math.floor(Math.random() * 6) + 1);
     };
     return DiceStock;
 }());
@@ -1412,10 +1430,10 @@ var DiceManager = /** @class */ (function () {
         var element = document.createElement("div");
         element.id = id;
         element.classList.add('bga-dice_die');
-        element.dataset.visibleFace = '' + die.face;
         element.style.setProperty('--size', "".concat((_a = dieType.size) !== null && _a !== void 0 ? _a : 50, "px"));
         var dieFaces = document.createElement("div");
         dieFaces.classList.add('bga-dice_die-faces');
+        dieFaces.dataset.visibleFace = '' + die.face;
         element.appendChild(dieFaces);
         var facesElements = [];
         for (var i = 1; i <= dieType.facesCount; i++) {

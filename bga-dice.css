@@ -21,52 +21,82 @@ body > .bga-dice_die {
   display: inline-block;
   transform: rotate3d(1, 1, 1, -720deg);
   transition: transform var(--roll-duration) ease-out;
-}
-.bga-dice_die .bga-dice_die-faces .bga-dice_die-face {
-  position: absolute;
-  width: var(--size);
-  height: var(--size);
-  display: inline-block;
-}
-
-.bga-dice_die6 {
-  --half-size: calc(var(--size) / 2);
-  transform: translateZ(var(--half-size));
-}
-.bga-dice_die6 .bga-dice_die-faces {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
   height: 100%;
   width: 100%;
 }
-.bga-dice_die6 .bga-dice_die-faces[data-roll="1"] {
-  transform: rotate3d(0, 0, 0, 0deg);
-}
-.bga-dice_die6 .bga-dice_die-faces[data-roll="2"] {
-  transform: rotate3d(1, 0, 0, 90deg);
-}
-.bga-dice_die6 .bga-dice_die-faces[data-roll="3"] {
-  transform: rotate3d(0, -1, 0, 90deg);
-}
-.bga-dice_die6 .bga-dice_die-faces[data-roll="4"] {
-  transform: rotate3d(0, 1, 0, 90deg);
-}
-.bga-dice_die6 .bga-dice_die-faces[data-roll="5"] {
-  transform: rotate3d(-1, 0, 0, 90deg);
-}
-.bga-dice_die6 .bga-dice_die-faces[data-roll="6"] {
-  transform: rotate3d(0, 1, 0, 180deg);
-}
-.bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face {
+.bga-dice_die .bga-dice_die-faces .bga-dice_die-face {
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  display: inline-block;
   height: 100%;
   width: 100%;
   grid-column: 1;
   grid-row: 1;
+}
+
+.bga-dice_die4 {
+  --third-size: calc(var(--size) / 3);
+  transform: translateZ(var(--third-size));
+}
+.bga-dice_die4 .bga-dice_die-faces[data-visible-face="1"] {
+  transform: rotate3d(0, 0, 0, 0deg);
+}
+.bga-dice_die4 .bga-dice_die-faces[data-visible-face="2"] {
+  transform: rotate3d(1, 0, 0, 90deg);
+}
+.bga-dice_die4 .bga-dice_die-faces[data-visible-face="3"] {
+  transform: rotate3d(0, -1, 0, 90deg);
+}
+.bga-dice_die4 .bga-dice_die-faces[data-visible-face="4"] {
+  transform: rotate3d(0, 1, 0, 90deg);
+}
+.bga-dice_die4 .bga-dice_die-faces .bga-dice_die-face {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+.bga-dice_die4 .bga-dice_die-faces .bga-dice_die-face[data-face="1"] {
+  transform: rotate3d(0, 0, 0, 0deg) translateZ(var(--third-size));
+}
+.bga-dice_die4 .bga-dice_die-faces .bga-dice_die-face[data-face="2"] {
+  transform: rotate3d(-1, 0, 0, 90deg) translateZ(var(--third-size));
+}
+.bga-dice_die4 .bga-dice_die-faces .bga-dice_die-face[data-face="3"] {
+  transform: rotate3d(0, 1, 0, 90deg) translateZ(var(--third-size));
+}
+.bga-dice_die4 .bga-dice_die-faces .bga-dice_die-face[data-face="4"] {
+  transform: rotate3d(0, -1, 0, 90deg) translateZ(var(--third-size));
+}
+
+.bga-dice_die6 {
+  --half-size: calc(var(--size) / 2);
+  transform: translateZ(var(--half-size));
+}
+.bga-dice_die6 .bga-dice_die-faces[data-visible-face="1"] {
+  transform: rotate3d(0, 0, 0, 0deg);
+}
+.bga-dice_die6 .bga-dice_die-faces[data-visible-face="2"] {
+  transform: rotate3d(1, 0, 0, 90deg);
+}
+.bga-dice_die6 .bga-dice_die-faces[data-visible-face="3"] {
+  transform: rotate3d(0, -1, 0, 90deg);
+}
+.bga-dice_die6 .bga-dice_die-faces[data-visible-face="4"] {
+  transform: rotate3d(0, 1, 0, 90deg);
+}
+.bga-dice_die6 .bga-dice_die-faces[data-visible-face="5"] {
+  transform: rotate3d(-1, 0, 0, 90deg);
+}
+.bga-dice_die6 .bga-dice_die-faces[data-visible-face="6"] {
+  transform: rotate3d(0, 1, 0, 180deg);
+}
+.bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face {
   border-radius: var(--bga-dice_border-radius);
 }
 .bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face[data-face="1"] {
-  transform: rotate3d(0, 0, 0, 90deg) translateZ(var(--half-size));
+  transform: rotate3d(0, 0, 0, 0deg) translateZ(var(--half-size));
 }
 .bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face[data-face="2"] {
   transform: rotate3d(-1, 0, 0, 90deg) translateZ(var(--half-size));
@@ -81,7 +111,7 @@ body > .bga-dice_die {
   transform: rotate3d(1, 0, 0, 90deg) translateZ(var(--half-size));
 }
 .bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face[data-face="6"] {
-  transform: rotate3d(1, 0, 0, 180deg) translateZ(var(--half-size));
+  transform: rotate3d(0, 1, 0, 180deg) translateZ(var(--half-size));
 }
 
 .bga-dice_die-stock {

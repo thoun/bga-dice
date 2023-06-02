@@ -1,3 +1,37 @@
 .bga-dice_die4 {
-    // TODO
+    --third-size: calc(var(--size) / 3);
+
+    transform: translateZ(var(--third-size));
+  
+    .bga-dice_die-faces {
+      &[data-visible-face="1"] {
+        transform: rotate3d(0, 0, 0, 0deg);
+      }
+      &[data-visible-face="2"] {
+        transform: rotate3d(1, 0, 0, 90deg);
+      }
+      &[data-visible-face="3"] {
+        transform: rotate3d(0, -1, 0, 90deg);
+      }
+      &[data-visible-face="4"] {
+        transform: rotate3d(0, 1, 0, 90deg);
+      }
+  
+      .bga-dice_die-face {
+        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    
+        &[data-face="1"] {
+          transform: rotate3d(0, 0, 0, 0deg) translateZ(var(--third-size));
+        }
+        &[data-face="2"] {
+          transform: rotate3d(-1, 0, 0, 90deg) translateZ(var(--third-size));
+        }
+        &[data-face="3"] {
+          transform: rotate3d(0, 1, 0, 90deg) translateZ(var(--third-size));
+        }
+        &[data-face="4"] {
+          transform: rotate3d(0, -1, 0, 90deg) translateZ(var(--third-size));
+        }
+      }
+    } 
 }

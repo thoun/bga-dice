@@ -32,14 +32,20 @@ h1, h2 {
     min-width: 500px;
 }
 
-.bga-dice_die .bga-dice_die-faces {
-    /*display: flex; /* TODO temp */
-}
-
 .colored-die .bga-dice_die-face {
     background: url('dice.jpg');
     background-size: 600% 600%;
     border-radius: 5px;
+}
+
+.kot-die6 .bga-dice_die-face {
+    background: url('kot-die6.png');
+    background-size: 600% 100%;
+}
+
+.kot-die4 .bga-dice_die-face {
+    background: url('kot-die6.png');
+    background-size: 600% 40%;
 }
 
 .white-die .bga-dice_die-face {

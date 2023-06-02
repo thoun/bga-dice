@@ -1,6 +1,6 @@
 let diceManager;
 
-class WhiteDie extends Die6 {
+class WhiteDie extends BgaDie6 {
     color;
 
     constructor(color) {

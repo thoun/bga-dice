@@ -14,7 +14,7 @@ interface Game {
 }
 
 interface Notif<T> {
-    args: Die;
+    args: BgaDie;
     log: string;
     move_id: number;
     table_id: string;
