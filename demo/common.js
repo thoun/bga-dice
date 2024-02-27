@@ -7,7 +7,8 @@ function initCommon() {
     <div class="nav">
         <a href="index.html">Index</a> | 
         <a href="stocks.html">Stocks</a> | 
-        <a href="selection.html">Die selection</a>
+        <a href="selection.html">Die selection</a> | 
+        <a href="custom.html">Custom die type</a>
     </div>
     <div>
         <input type="checkbox" id="instantaneousMode" onclick="game.instantaneousMode = !game.instantaneousMode">
