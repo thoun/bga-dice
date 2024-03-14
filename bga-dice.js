@@ -499,6 +499,12 @@ function sortFunction() {
         return 0;
     };
 }
+var BGA_DIE4_FACE_NUMBERS = {
+    1: [2, 4, 3],
+    2: [1, 3, 4],
+    3: [1, 4, 2],
+    4: [1, 2, 3],
+};
 var BgaDie4 = /** @class */ (function () {
     /**
      * Create the die type.
@@ -519,6 +525,22 @@ var BgaDie4 = /** @class */ (function () {
      */
     BgaDie4.prototype.setupDieDiv = function (die, element) {
         element.classList.add('bga-dice_die4');
+    };
+    /**
+     * Allow to populate a face div of the die. You can set classes or dataset to show the correct die face.
+     *
+     * @param die the die informations
+     * @param element the die face Div element
+     * @param face the face number (1-indexed)
+     */
+    BgaDie4.prototype.setupFaceDiv = function (die, element, face) {
+        for (var i = 0; i < 3; i++) {
+            var number = document.createElement('div');
+            number.classList.add('bga-dice_die-face-number');
+            number.dataset.number = "".concat(BGA_DIE4_FACE_NUMBERS[face][i]);
+            element.appendChild(number);
+            console.log(element.outerHTML);
+        }
     };
     return BgaDie4;
 }());

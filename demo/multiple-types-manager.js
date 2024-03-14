@@ -37,7 +37,7 @@ class KoTDie6 extends BgaDie6 {
 }
 
 class KoTDie4 extends BgaDie4 {
-    size = 80;
+    size = 150;
 
     constructor() {
         super();
@@ -49,7 +49,7 @@ class KoTDie4 extends BgaDie4 {
     }
 
     setupFaceDiv(die, element, face) {
-
+        super.setupFaceDiv(die, element, face);
     }
 }
 

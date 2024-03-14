@@ -20,8 +20,8 @@ function initLineStock() {
         { id: getDieId(), type: 'red', face: 1, location: 'table', location_arg: 0 },
         { id: getDieId(), type: 'yellow', face: 6, location: 'table', location_arg: 0 },
         { id: getDieId(), type: 'green', face: 4, location: 'table', location_arg: 0 },
-        { id: getDieId(), type: 'kot6', face: 3, location: 'table', location_arg: 0 },
         { id: getDieId(), type: 'kot4', face: 3, location: 'table', location_arg: 0 },
+        { id: getDieId(), type: 'kot6', face: 3, location: 'table', location_arg: 0 },
     ]);
 }
 

@@ -44,8 +44,35 @@ h1, h2 {
 }
 
 .kot-die4 .bga-dice_die-face {
-    background: url('kot-die6.png');
-    background-size: 600% 40%;
+    background: linear-gradient(90deg, lightgoldenrodyellow 0%, gold 100%);
+}
+
+
+
+.kot-die4 .bga-dice_die-face-number::after {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    text-align: center;
+    color: navy;
+    font-size: 16pt;
+    font-weight: bold;
+    padding-top: calc(var(--size) * 0.1);
+  }
+
+.kot-die4 .bga-dice_die-face-number[data-number="1"]::after {
+    content: '1';
+}
+.kot-die4 .bga-dice_die-face-number[data-number="2"]::after {
+    content: '2';
+}
+.kot-die4 .bga-dice_die-face-number[data-number="3"]::after {
+    content: '3';
+}
+.kot-die4 .bga-dice_die-face-number[data-number="4"]::after {
+    content: '4';
 }
 
 .white-die .bga-dice_die-face {

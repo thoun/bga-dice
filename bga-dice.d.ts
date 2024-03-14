@@ -314,6 +314,12 @@ interface BgaDie4Settings {
      */
     showValueOverlay?: boolean;
 }
+declare const BGA_DIE4_FACE_NUMBERS: {
+    1: number[];
+    2: number[];
+    3: number[];
+    4: number[];
+};
 declare class BgaDie4 implements BgaDieType {
     protected settings?: BgaDie4Settings;
     facesCount: number;
@@ -331,6 +337,14 @@ declare class BgaDie4 implements BgaDieType {
      * @param element the die main Div element
      */
     setupDieDiv(die: BgaDie, element: HTMLDivElement): void;
+    /**
+     * Allow to populate a face div of the die. You can set classes or dataset to show the correct die face.
+     *
+     * @param die the die informations
+     * @param element the die face Div element
+     * @param face the face number (1-indexed)
+     */
+    setupFaceDiv(die: BgaDie, element: HTMLDivElement, face: number): void;
 }
 interface BgaDie6Settings {
     /**

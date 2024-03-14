@@ -17,6 +17,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    border: 5px solid white;
+    box-sizing: border-box;
 }
 
 .bga-dice_die6.takenokolor-die .bga-dice_die-faces .bga-dice_die-face[data-face="1"] {
