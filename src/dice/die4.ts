@@ -48,7 +48,6 @@ class BgaDie4 implements BgaDieType {
             number.classList.add('bga-dice_die-face-number');
             number.dataset.number = `${BGA_DIE4_FACE_NUMBERS[face][i]}`;
             element.appendChild(number);
-            console.log(element.outerHTML);
         }
     }
 }

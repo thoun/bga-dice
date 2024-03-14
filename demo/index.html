@@ -24,7 +24,8 @@
                 <option value="turn">turn</option>
                 <option value="none">none</option>
             </select>
-            <button onclick="roll(document.getElementById('roll-effect').value)">roll</button>
+            <button onclick="roll(document.getElementById('roll-effect').value, false)">roll</button>
+            <button onclick="roll(document.getElementById('roll-effect').value, true)">change values & roll</button>
             <br><br>
 
             <div id="line-stock"></div>

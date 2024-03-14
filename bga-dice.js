@@ -539,7 +539,6 @@ var BgaDie4 = /** @class */ (function () {
             number.classList.add('bga-dice_die-face-number');
             number.dataset.number = "".concat(BGA_DIE4_FACE_NUMBERS[face][i]);
             element.appendChild(number);
-            console.log(element.outerHTML);
         }
     };
     return BgaDie4;
@@ -1154,11 +1153,16 @@ var DiceStock = /** @class */ (function () {
                 var diff = Math.abs(duration[1] - duration[0]);
                 duration = Math.min.apply(Math, duration) + Math.floor(Math.random() * diff);
             }
+            if (rollEffect.includes('roll')) {
+                faces.style.transform = "rotate3d(".concat(Math.random() < 0.5 ? -1 : 1, ", ").concat(Math.random() < 0.5 ? -1 : 1, ", ").concat(Math.random() < 0.5 ? -1 : 1, ", ").concat(720 + Math.random() * 360, "deg)");
+                faces.clientWidth;
+            }
             this.addRollEffectToDieElement(die, div, rollEffect, duration);
         }
         faces.style.setProperty('--roll-duration', "".concat(animate ? duration : 0, "ms"));
         faces.clientWidth;
-        faces.dataset.visibleFace = "".concat(Math.floor(Math.random() * 6) + 1);
+        faces.style.removeProperty('transform');
+        faces.dataset.visibleFace = "".concat(die.face);
     };
     return DiceStock;
 }());

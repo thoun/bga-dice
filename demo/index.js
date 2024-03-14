@@ -25,9 +25,11 @@ function initLineStock() {
     ]);
 }
 
-function roll(effect) {
+function roll(effect, changeValue) {
     const dice = lineStock.getDice();
-    dice.forEach(die => die.value = Math.floor(Math.random() * 6) + 1);
+    if (changeValue) {
+        dice.forEach(die => die.face = Math.floor(Math.random() * diceManager.getDieType(die).facesCount) + 1);
+    }
     lineStock.rollDice(dice, {
         effect,
         duration: [800, 1200]

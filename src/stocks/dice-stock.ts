@@ -678,11 +678,18 @@ class DiceStock {
                 const diff = Math.abs(duration[1] - duration[0]);
                 duration = Math.min(...duration) + Math.floor(Math.random() * diff);
             }
+
+            if (rollEffect.includes('roll')) {
+                faces.style.transform = `rotate3d(${Math.random() < 0.5 ? -1 : 1}, ${Math.random() < 0.5 ? -1 : 1}, ${Math.random() < 0.5 ? -1 : 1}, ${720 + Math.random() * 360}deg)`;
+                faces.clientWidth;
+            }
+
             this.addRollEffectToDieElement(die, div, rollEffect, duration);
         }
 
         faces.style.setProperty('--roll-duration', `${animate ? duration : 0}ms`);
         faces.clientWidth;
-        faces.dataset.visibleFace = `${Math.floor(Math.random() * 6) + 1}`;
+        faces.style.removeProperty('transform');
+        faces.dataset.visibleFace = `${die.face}`;
     }
 }
