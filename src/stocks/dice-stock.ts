@@ -554,7 +554,7 @@ class DiceStock {
     protected async animationFromElement(element: HTMLElement, fromRect: DOMRect, settings: DieAnimationSettings): Promise<boolean> {
         const side = element.dataset.side;
         if (settings.originalSide && settings.originalSide != side) {
-            const diceides = element.getElementsByClassName('die-sides')[0] as HTMLDivElement;
+            const diceides = element.getElementsByClassName('bga-dice_die-face')[0] as HTMLDivElement;
             diceides.style.transition = 'none';
             element.dataset.side = settings.originalSide;
             setTimeout(() => {
