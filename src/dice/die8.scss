@@ -1,8 +1,8 @@
-$angle: 70.528779deg;
+$angle: 35deg;
 $sqrt3div2pct: 86.6%;  // V¨3 / 2
 
-.bga-dice_die4 {
-    --third-size: calc(var(--size) / 3 * 0.6);
+.bga-dice_die8 {
+    --third-size: calc(var(--size) * 0.433); // V¨3 / 2 / 2
 
     transform: translateZ(var(--third-size));
   
@@ -28,16 +28,32 @@ $sqrt3div2pct: 86.6%;  // V¨3 / 2
         margin-top: calc(var-(--size) * -0.5);
     
         &[data-face="1"] {
-          transform: rotate3d(0, 1, 0, 180deg) translateZ(var(--third-size));
-        }
-        &[data-face="2"] {
           transform: rotateZ(0deg) rotateX(-$angle) translateZ(var(--third-size));
         }
+        &[data-face="2"] {
+          transform: rotateZ(90deg) rotateX(-$angle) translateZ(var(--third-size));
+        }
         &[data-face="3"] {
-          transform: rotateZ(120deg) rotateX(-$angle) translateZ(var(--third-size));
+          transform: rotateZ(180deg) rotateX(-$angle) translateZ(var(--third-size));
         }
         &[data-face="4"] {
-          transform: rotateZ(240deg) rotateX(-$angle) translateZ(var(--third-size));
+          transform: rotateZ(270deg) rotateX(-$angle) translateZ(var(--third-size));
+        }
+        &[data-face="5"] {
+          transform: rotateZ(0deg) rotateX($angle) translateZ(var(--third-size)) rotate3d(1, 1, 1, 180deg);
+          display: none;
+        }
+        &[data-face="6"] {
+          transform: rotateZ(90deg) rotateX($angle) translateZ(var(--third-size)) rotate3d(1, 1, 1, 180deg);
+          display: none;
+        }
+        &[data-face="7"] {
+          transform: rotateZ(180deg) rotateX($angle) translateZ(var(--third-size)) rotate3d(1, 1, 1, 180deg);
+          display: none;
+        }
+        &[data-face="8"] {
+          transform: rotateZ(270deg) rotateX($angle) translateZ(var(--third-size)) rotate3d(1, 1, 1, 180deg);
+          display: none;
         }
 
         .bga-dice_die-face-number {

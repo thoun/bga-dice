@@ -249,16 +249,14 @@ class DiceStock {
         let promise: Promise<boolean>;
 
         const element = animation.fromStock.contains(die) ? this.manager.getDieElement(die) : animation.fromStock.element;
-        const fromRect = element.getBoundingClientRect();
 
         this.addDieElementToParent(dieElement, settings);
 
         this.removeSelectionClassesFromElement(dieElement);
 
-        promise = this.animationFromElement(dieElement, fromRect, {
+        promise = this.animationFromElement(dieElement, element, {
             originalSide: animation.originalSide, 
             rotationDelta: animation.rotationDelta,
-            animation: animation.animation,
         });
         // in the case the die was move inside the same stock we don't remove it
         if (animation.fromStock && animation.fromStock != this) {
@@ -280,17 +278,15 @@ class DiceStock {
     
         if (animation) {
             if (animation.fromStock) {
-                promise = this.animationFromElement(dieElement, animation.fromStock.element.getBoundingClientRect(), {
+                promise = this.animationFromElement(dieElement, animation.fromStock.element, {
                     originalSide: animation.originalSide, 
                     rotationDelta: animation.rotationDelta,
-                    animation: animation.animation,
                 });
                 animation.fromStock.removeDie(die);
             } else if (animation.fromElement) {
-                promise = this.animationFromElement(dieElement,  animation.fromElement.getBoundingClientRect(), {
+                promise = this.animationFromElement(dieElement,  animation.fromElement, {
                     originalSide: animation.originalSide, 
                     rotationDelta: animation.rotationDelta,
-                    animation: animation.animation,
                 });
             }
         } else {
@@ -314,7 +310,7 @@ class DiceStock {
      * @param shift if number, the number of milliseconds between each die. if true, chain animations
      */
     public async addDice(dice: BgaDie[], animation?: DieAnimation, settings?: AddDieSettings, shift: number | boolean = false): Promise<boolean> {
-        if (!this.manager.animationsActive()) {
+        if (!this.manager.game.bgaAnimationsActive()) {
             shift = false;
         }
         let promises: Promise<boolean>[] = [];
@@ -551,7 +547,7 @@ class DiceStock {
      * @param element The element to animate. The element is added to the destination stock before the animation starts. 
      * @param fromElement The HTMLElement to animate from.
      */
-    protected async animationFromElement(element: HTMLElement, fromRect: DOMRect, settings: DieAnimationSettings): Promise<boolean> {
+    protected async animationFromElement(element: HTMLElement, fromElement: HTMLElement, settings: DieAnimationSettings): Promise<boolean> {
         const side = element.dataset.side;
         if (settings.originalSide && settings.originalSide != side) {
             const diceides = element.getElementsByClassName('die-sides')[0] as HTMLDivElement;
@@ -563,15 +559,7 @@ class DiceStock {
             });
         }
 
-        let animation = settings.animation;
-        if (animation) {
-            animation.settings.element = element;
-            (animation.settings as BgaAnimationWithOriginSettings).fromRect = fromRect;
-        } else {
-            animation = new BgaSlideAnimation({ element, fromRect });
-        }
-
-        const result = await this.manager.animationManager.play(animation);
+        const result = await this.manager.animationManager.slideIn(element, fromElement);
         return result?.played ?? false;
     }
 
@@ -615,44 +603,37 @@ class DiceStock {
         dieElement.classList.remove(selectableDiceClass, unselectableDiceClass, selectedDiceClass);
     }
 
-    protected addRollEffectToDieElement(die: BgaDie, element: HTMLElement, effect: DiceRollEffect, duration: number) {
+    protected async addRollEffectToDieElement(die: BgaDie, element: HTMLElement, effect: DiceRollEffect, duration: number) {
         switch (effect) {
             case 'rollIn':
-                this.manager.animationManager.play(new BgaSlideAnimation({
+                await element.animate([
+                    { transform: `translate(0px, ${-(this.manager.getDieType(die).size ?? 50) * 5}px)`},
+                    { transform: `translate(0px, 0px)` },
+                ], duration).finished;
+                /*this.manager.animationManager.slideInFromDelta(
                     element,
-                    duration,
-                    transitionTimingFunction: 'ease-out',
-                    fromDelta: {
+                    {
                         x: 0,
-                        y: (this.manager.getDieType(die).size ?? 50) * 5,
+                        y: -(this.manager.getDieType(die).size ?? 50) * 5,
                     }
-                }));
+                );*/
                 break;
             case 'rollOutPauseAndBack':
-                this.manager.animationManager.play(new BgaCumulatedAnimation({ animations: [
-                    new BgaSlideToAnimation({
-                        element,
-                        duration,
-                        transitionTimingFunction: 'ease-out',
-                        fromDelta: {
-                            x: 0,
-                            y: (this.manager.getDieType(die).size ?? 50) * -5,
-                        }
-                    }),
-                    new BgaPauseAnimation({}),
-                    new BgaSlideToAnimation({
-                        duration: 250,
-                        transitionTimingFunction: 'ease-out',
-                        element,
-                        fromDelta: {
-                            x: 0,
-                            y: 0,
-                        }
-                    }),
-                ]}));
+                await element.animate([
+                    { transform: `translate(0px, 0px)` },
+                    { transform: `translate(0px, ${(this.manager.getDieType(die).size ?? 50) * 5}px)`},
+                ], duration).finished;
+                await element.animate([
+                    { transform: `translate(0px, ${(this.manager.getDieType(die).size ?? 50) * 5}px)`},
+                    { transform: `translate(0px, ${(this.manager.getDieType(die).size ?? 50) * 5}px)`},
+                ], duration).finished;
+                await element.animate([
+                    { transform: `translate(0px, ${(this.manager.getDieType(die).size ?? 50) * 5}px)`},
+                    { transform: `translate(0px, 0px)` },
+                ], duration).finished;
                 break;
             case 'turn':
-                this.manager.animationManager.play(new BgaPauseAnimation({ duration }));
+                await this.manager.game.wait(duration);
                 break;
         }
     }
@@ -671,7 +652,7 @@ class DiceStock {
         faces.clientWidth;
 
         const rollEffect = settings?.effect ?? 'rollIn';
-        const animate = this.manager.animationManager.animationsActive() && rollEffect !== 'none';
+        const animate = this.manager.game.bgaAnimationsActive() && rollEffect !== 'none';
         let duration = settings?.duration ?? 1000;
         if (animate) {
             if (Array.isArray(duration)) {

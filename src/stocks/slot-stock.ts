@@ -124,7 +124,6 @@ class SlotDiceStock extends LineDiceStock {
         const promises: Promise<boolean>[] = [];
 
         const elements = dice.map(die => this.manager.getDieElement(die));
-        const elementsRects = elements.map(element => element.getBoundingClientRect());
         const cssPositions = elements.map(element => element.style.position);
 
         // we set to absolute so it doesn't mess with slide coordinates when 2 div are at the same place
@@ -148,7 +147,7 @@ class SlotDiceStock extends LineDiceStock {
             }
 
             this.removeSelectionClassesFromElement(dieElement);
-            promise = this.animationFromElement(dieElement, elementsRects[index], {});
+            promise = this.animationFromElement(dieElement, elements[index], {});
             
             if (!promise) {
                 console.warn(`Dicetock.animationFromElement didn't return a Promise`);

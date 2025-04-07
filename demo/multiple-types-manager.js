@@ -53,6 +53,21 @@ class KoTDie4 extends BgaDie4 {
     }
 }
 
+class NumberedDie8 extends BgaDie8 {
+    size = 200;
+
+    constructor() {
+        super();
+    }
+
+    setupFaceDiv(die, element, face) {
+        super.setupFaceDiv?.(die, element, face);
+        element.innerText = face;
+    }
+}
+
+
+
 function initManager() {
     diceManager = new DiceManager(game, {
         dieTypes: {
@@ -63,6 +78,7 @@ function initManager() {
             'blue': new ColoredDie6(4),
             'kot6': new KoTDie6(),
             'kot4': new KoTDie4(),
+            'd8': new NumberedDie8(),
         },
     });
 }

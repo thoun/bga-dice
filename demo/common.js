@@ -1,5 +1,22 @@
+let gameLoaded = false;
+
+window.onload = setTimeout(() => gameLoaded = true, 500);
+
 let game = {
+    instantaneousMode: false,
+    
     addTooltipHtml: (divId, tooltip) => { document.getElementById(divId).title = tooltip },
+
+    bgaAnimationsActive: function() {
+        return document.visibilityState !== 'hidden' && !this.instantaneousMode && gameLoaded;
+    },
+    wait: function(delay) {
+        if (delay > 0 && this.bgaAnimationsActive()) {
+            return new Promise(resolve => setTimeout(resolve, delay));
+        } else {
+            return Promise.resolve();
+        }
+    },
 };
 
 function initCommon() {

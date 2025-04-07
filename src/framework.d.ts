@@ -4,6 +4,22 @@
 
 interface Game {
     instantaneousMode: boolean;
+    getBoundingClientRectIgnoreZoom(element: Element): DOMRect;
+    /**
+     * Function to know if animations should be played.
+     * Animations should not be played in instantaneousMode, or if the tab is not displayed in the browser.
+     * 
+     * @returns {boolean} if animations should be played
+     */
+    bgaAnimationsActive(): boolean;
+    /**
+     * Return a Promise that resolves at the end of a given number of ms.
+     * If animations are not active, resolve instantaneously.
+     * 
+     * @param {number} delay the time to wait, in milliseconds
+     * @returns a promise when the timer ends
+     */
+    wait(delay: number): Promise<any>;
     
     setup: (gamedatas: any) => void;
     onEnteringState: (stateName: string, args: any) => void;
@@ -14,7 +30,7 @@ interface Game {
 }
 
 interface Notif<T> {
-    args: BgaDie;
+    args: T;
     log: string;
     move_id: number;
     table_id: string;

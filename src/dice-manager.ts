@@ -45,15 +45,6 @@ class DiceManager {
             Object.entries(settings.dieTypes).forEach(entry => this.setDieType(entry[0], entry[1]));
         }
     }
-    
-    /**
-     * Returns if the animations are active. Animation aren't active when the window is not visible (`document.visibilityState === 'hidden'`), or `game.instantaneousMode` is true.
-     * 
-     * @returns if the animations are active.
-     */
-    public animationsActive(): boolean {
-        return this.animationManager.animationsActive();
-    }
 
     public addStock(stock: DiceStock) {
         this.stocks.push(stock);
