@@ -558,10 +558,11 @@ var DiceStock = /** @class */ (function () {
     DiceStock.prototype.getRand = function (min, max) {
         return Math.floor(Math.random() * ((max + 1) - min) + min);
     };
-    DiceStock.prototype.getRollAnimation = function (element, duration, deltaYFrom, deltaYTo, moveHorizontally) {
+    DiceStock.prototype.getRollAnimation = function (element, duration, deltaYFrom, deltaYTo, moveHorizontally, angle) {
         if (deltaYFrom === void 0) { deltaYFrom = 0; }
         if (deltaYTo === void 0) { deltaYTo = 0; }
         if (moveHorizontally === void 0) { moveHorizontally = true; }
+        if (angle === void 0) { angle = 0; }
         return __awaiter(this, void 0, void 0, function () {
             var size, distance, horizontalMargin;
             var _this = this;
@@ -572,12 +573,12 @@ var DiceStock = /** @class */ (function () {
                         distance = deltaYTo - deltaYFrom;
                         horizontalMargin = function () { return moveHorizontally ? _this.getRand(-size / 4, size / 4) : 0; };
                         return [4 /*yield*/, element.animate([
-                                { transform: "translate(".concat(horizontalMargin(), "px, ").concat(deltaYFrom, "px) translateZ(").concat(size * 4, "px)") },
-                                { transform: "translate(".concat(horizontalMargin(), "px, ").concat(deltaYFrom + distance * 0.2, "px)") },
-                                { transform: "translate(".concat(horizontalMargin(), "px, ").concat(deltaYFrom + distance * 0.4, "px) translateZ(").concat(size * 3, "px)") },
-                                { transform: "translate(".concat(horizontalMargin(), "px, ").concat(deltaYFrom + distance * 0.6, "px)") },
-                                { transform: "translate(".concat(horizontalMargin(), "px, ").concat(deltaYFrom + distance * 0.8, "px) translateZ(").concat(size * 2, "px)") },
-                                { transform: "translate(0px, ".concat(deltaYTo, "px)") },
+                                { transform: "translate(".concat(horizontalMargin(), "px, ").concat(deltaYFrom, "px) translateZ(").concat(size * 4, "px) rotate(").concat(angle, "deg)") },
+                                { transform: "translate(".concat(horizontalMargin(), "px, ").concat(deltaYFrom + distance * 0.2, "px) rotate(").concat(angle, "deg)") },
+                                { transform: "translate(".concat(horizontalMargin(), "px, ").concat(deltaYFrom + distance * 0.4, "px) translateZ(").concat(size * 3, "px) rotate(").concat(angle, "deg)") },
+                                { transform: "translate(".concat(horizontalMargin(), "px, ").concat(deltaYFrom + distance * 0.6, "px) rotate(").concat(angle, "deg)") },
+                                { transform: "translate(".concat(horizontalMargin(), "px, ").concat(deltaYFrom + distance * 0.8, "px) translateZ(").concat(size * 2, "px) rotate(").concat(angle, "deg)") },
+                                { transform: "translate(0px, ".concat(deltaYTo, "px) rotate(").concat(angle, "deg)") },
                             ], duration).finished];
                     case 1:
                         _a.sent();
@@ -588,7 +589,7 @@ var DiceStock = /** @class */ (function () {
     };
     DiceStock.prototype.addRollEffectToDieElement = function (die, element, effect, duration) {
         return __awaiter(this, void 0, void 0, function () {
-            var size, _a;
+            var size, _a, angle;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -604,17 +605,19 @@ var DiceStock = /** @class */ (function () {
                     case 2:
                         _b.sent();
                         return [3 /*break*/, 9];
-                    case 3: return [4 /*yield*/, this.getRollAnimation(element, duration, 0, size * 5)];
+                    case 3:
+                        angle = this.getRand(-45, 45);
+                        return [4 /*yield*/, this.getRollAnimation(element, duration, 0, size * 5, true, angle)];
                     case 4:
                         _b.sent();
                         return [4 /*yield*/, element.animate([
-                                { transform: "translate(0px, ".concat(size * 5, "px)") },
-                                { transform: "translate(0px, ".concat(size * 5, "px)") },
+                                { transform: "translate(0px, ".concat(size * 5, "px) rotate(").concat(angle, "deg)") },
+                                { transform: "translate(0px, ".concat(size * 5, "px) rotate(").concat(angle, "deg)") },
                             ], duration / 3).finished];
                     case 5:
                         _b.sent();
                         return [4 /*yield*/, element.animate([
-                                { transform: "translate(0px, ".concat(size * 5, "px)") },
+                                { transform: "translate(0px, ".concat(size * 5, "px) rotate(").concat(angle, "deg)") },
                                 { transform: "translate(0px, 0px)" },
                             ], duration / 3).finished];
                     case 6:

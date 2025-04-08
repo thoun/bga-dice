@@ -567,17 +567,17 @@ class DiceStock<T> {
         return Math.floor(Math.random() * ((max + 1) - min) + min);
     }
 
-    protected async getRollAnimation(element: Element, duration: number, deltaYFrom: number = 0, deltaYTo: number = 0, moveHorizontally: boolean = true) {
+    protected async getRollAnimation(element: Element, duration: number, deltaYFrom: number = 0, deltaYTo: number = 0, moveHorizontally: boolean = true, angle: number = 0) {
         const size = this.manager.getSize();
         const distance = deltaYTo - deltaYFrom;
         const horizontalMargin = () => moveHorizontally ? this.getRand(-size / 4, size / 4) : 0;
         await element.animate([
-            { transform: `translate(${horizontalMargin()}px, ${deltaYFrom}px) translateZ(${size * 4}px)`},
-            { transform: `translate(${horizontalMargin()}px, ${deltaYFrom + distance * 0.2}px)`},
-            { transform: `translate(${horizontalMargin()}px, ${deltaYFrom + distance * 0.4}px) translateZ(${size * 3}px)`},
-            { transform: `translate(${horizontalMargin()}px, ${deltaYFrom + distance * 0.6}px)`},
-            { transform: `translate(${horizontalMargin()}px, ${deltaYFrom + distance * 0.8}px) translateZ(${size * 2}px)`},
-            { transform: `translate(0px, ${deltaYTo}px)` },
+            { transform: `translate(${horizontalMargin()}px, ${deltaYFrom}px) translateZ(${size * 4}px) rotate(${angle}deg)`},
+            { transform: `translate(${horizontalMargin()}px, ${deltaYFrom + distance * 0.2}px) rotate(${angle}deg)`},
+            { transform: `translate(${horizontalMargin()}px, ${deltaYFrom + distance * 0.4}px) translateZ(${size * 3}px) rotate(${angle}deg)`},
+            { transform: `translate(${horizontalMargin()}px, ${deltaYFrom + distance * 0.6}px) rotate(${angle}deg)`},
+            { transform: `translate(${horizontalMargin()}px, ${deltaYFrom + distance * 0.8}px) translateZ(${size * 2}px) rotate(${angle}deg)`},
+            { transform: `translate(0px, ${deltaYTo}px) rotate(${angle}deg)` },
         ], duration).finished;
     }
 
@@ -588,13 +588,14 @@ class DiceStock<T> {
                 await this.getRollAnimation(element, duration, -size * 5, 0);
                 break;
             case 'rollOutPauseAndBack':
-                await this.getRollAnimation(element, duration, 0, size * 5);
+                const angle = this.getRand(-45, 45);
+                await this.getRollAnimation(element, duration, 0, size * 5, true, angle);
                 await element.animate([
-                    { transform: `translate(0px, ${size * 5}px)`},
-                    { transform: `translate(0px, ${size * 5}px)`},
+                    { transform: `translate(0px, ${size * 5}px) rotate(${angle}deg)` },
+                    { transform: `translate(0px, ${size * 5}px) rotate(${angle}deg)` },
                 ], duration / 3).finished;
                 await element.animate([
-                    { transform: `translate(0px, ${size * 5}px)`},
+                    { transform: `translate(0px, ${size * 5}px) rotate(${angle}deg)` },
                     { transform: `translate(0px, 0px)` },
                 ], duration / 3).finished;
                 break;
