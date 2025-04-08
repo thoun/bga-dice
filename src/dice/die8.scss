@@ -1,83 +1,61 @@
-$angle: 35deg;
-$sqrt3div2pct: 86.6%;  // V¨3 / 2
+$sqrt3: 1.732;
+$tilt: 35.27deg; // atan(1/sqrt(2))
 
 .bga-dice_die8 {
-    --third-size: calc(var(--size) * 0.433); // V¨3 / 2 / 2
+  --half-size: calc(var(--size) / 2);
+  transform: translateZ(var(--half-size));
 
-    transform: translateZ(var(--third-size));
-  
-    .bga-dice_die-faces {
-      &[data-visible-face="1"] {
-        transform: rotateZ(0deg) rotateX(0deg);
-      }
-      &[data-visible-face="2"] {
-        transform: rotate3d(0, 1, 0, 180deg) rotateZ(0deg) rotateX($angle);
-      }
-      &[data-visible-face="3"] {
-        transform: rotateZ(180deg) rotateX(250deg) rotateZ(-120deg);
-      }
-      &[data-visible-face="4"] {
-        transform: rotateX(120deg) rotateZ(-60deg);
-      }
-  
-      .bga-dice_die-face {
-        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-        height: $sqrt3div2pct;
-        transform-origin: 50% 66.66667%;
-        margin-left: calc(var-(--size) * -0.5);
-        margin-top: calc(var-(--size) * -0.5);
-    
-        &[data-face="1"] {
-          transform: rotateZ(0deg) rotateX(-$angle) translateZ(var(--third-size));
-        }
-        &[data-face="2"] {
-          transform: rotateZ(90deg) rotateX(-$angle) translateZ(var(--third-size));
-        }
-        &[data-face="3"] {
-          transform: rotateZ(180deg) rotateX(-$angle) translateZ(var(--third-size));
-        }
-        &[data-face="4"] {
-          transform: rotateZ(270deg) rotateX(-$angle) translateZ(var(--third-size));
-        }
-        &[data-face="5"] {
-          transform: rotateZ(0deg) rotateX($angle) translateZ(var(--third-size)) rotate3d(1, 1, 1, 180deg);
-          display: none;
-        }
-        &[data-face="6"] {
-          transform: rotateZ(90deg) rotateX($angle) translateZ(var(--third-size)) rotate3d(1, 1, 1, 180deg);
-          display: none;
-        }
-        &[data-face="7"] {
-          transform: rotateZ(180deg) rotateX($angle) translateZ(var(--third-size)) rotate3d(1, 1, 1, 180deg);
-          display: none;
-        }
-        &[data-face="8"] {
-          transform: rotateZ(270deg) rotateX($angle) translateZ(var(--third-size)) rotate3d(1, 1, 1, 180deg);
-          display: none;
-        }
+  .bga-dice_die-faces {
+    // Top Faces (1-4) need negative tilt on X
+    &[data-visible-face="1"] { // Top-Front
+      transform: rotateY(0deg) rotateX(-$tilt);
+    }
+    &[data-visible-face="2"] { // Top-Right (Rotate 1st face -90deg around Y)
+      transform: rotateY(270deg) rotateX(-$tilt);
+    }
+    &[data-visible-face="3"] { // Top-Back (Rotate 1st face -180deg around Y)
+      transform: rotateY(180deg) rotateX(-$tilt);
+    }
+    &[data-visible-face="4"] { // Top-Left (Rotate 1st face -270deg around Y)
+      transform: rotateY(90deg) rotateX(-$tilt);
+    }
 
-        .bga-dice_die-face-number {
-          transform-origin: center 66.66667%;
-          position: absolute;
-          left: 0;
-          right: 0;
-          top: 0;
-          bottom: 0;
-          text-align: center;
-          display: block;
-        }
+    // Bottom Faces (5-8) need flip (180deg) + negative tilt on X
+    &[data-visible-face="5"] { // Bottom-Front
+      transform: rotateY(0deg) rotateX(180deg - $tilt);
+    }
+    &[data-visible-face="6"] { // Bottom-Right (Rotate 5th face -90deg around Y)
+      transform: rotateY(270deg) rotateX(180deg - $tilt);
+    }
+    &[data-visible-face="7"] { // Bottom-Back (Rotate 5th face -180deg around Y)
+      transform: rotateY(180deg) rotateX(180deg - $tilt);
+    }
+    &[data-visible-face="8"] { // Bottom-Left (Rotate 5th face -270deg around Y)
+      transform: rotateY(90deg) rotateX(180deg - $tilt);
+    }
 
-        .bga-dice_die-face-number:nth-child(1) {
-          transform: rotateZ(0deg);
-        }
+    .bga-dice_die-face {
+      clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
 
-        .bga-dice_die-face-number:nth-child(2) {
-          transform: rotateZ(120deg);
-        }
+      position: absolute;
+      left: 0;
+      bottom: 50%;
+      height: calc(var(--half-size) * $sqrt3);
+      width: var(--size);
+      transform-origin: 50% 100%;
 
-        .bga-dice_die-face-number:nth-child(3) {
-          transform: rotateZ(240deg);
+      @for $i from 1 through 8 {
+        $faceTilt: $tilt;
+        @if $i > 4 {
+          $faceTilt: 180deg - $tilt;
+        }
+        
+        $yRotation: ($i - 1) * 90deg;
+
+        &[data-face="#{$i}"] {
+          transform: rotateY($yRotation) translateZ(var(--half-size)) rotateX($faceTilt);
         }
       }
-    } 
+    }
+  } 
 }

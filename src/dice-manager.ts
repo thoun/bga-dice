@@ -181,7 +181,6 @@ class DiceManager<T> {
             facesElements[i].classList.add('bga-dice_die-face', `${type}-face-${i}`);
             facesElements[i].dataset.face = ''+i;
             dieFaces.appendChild(facesElements[i]);
-            element.dataset.face = ''+i;
         }
         
 
@@ -241,7 +240,7 @@ class DiceManager<T> {
      */
     public updateDieInformations(die: T, updateData?: boolean): void {
         const div = this.getDieElement(die);
-        div.dataset.visibleFace = ''+this.getDieFace(die);
+        (div.querySelector('.bga-dice_die-faces') as HTMLDivElement).dataset.visibleFace = ''+this.getDieFace(die);
 
         if (updateData ?? true) {
             // die data has changed

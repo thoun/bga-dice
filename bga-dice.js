@@ -651,7 +651,7 @@ var DiceStock = /** @class */ (function () {
                         if (Array.isArray(duration)) {
                             duration = this.getRand(duration[0], duration[1]);
                         }
-                        getRandDeg = function () { return _this.getRand(360, 540); };
+                        getRandDeg = function () { return _this.getRand(540, 720); };
                         return [4 /*yield*/, Promise.all([
                                 // dice movement animation (slide with bumps)
                                 this.addRollEffectToDieElement(die, div, rollEffect, duration),
@@ -1020,7 +1020,6 @@ var DiceManager = /** @class */ (function () {
             facesElements[i].classList.add('bga-dice_die-face', "".concat(type, "-face-").concat(i));
             facesElements[i].dataset.face = '' + i;
             dieFaces.appendChild(facesElements[i]);
-            element.dataset.face = '' + i;
         }
         document.body.appendChild(element);
         (_b = (_a = this.settings).setupDieDiv) === null || _b === void 0 ? void 0 : _b.call(_a, die, element);
@@ -1073,7 +1072,7 @@ var DiceManager = /** @class */ (function () {
     DiceManager.prototype.updateDieInformations = function (die, updateData) {
         var _this = this;
         var div = this.getDieElement(die);
-        div.dataset.visibleFace = '' + this.getDieFace(die);
+        div.querySelector('.bga-dice_die-faces').dataset.visibleFace = '' + this.getDieFace(die);
         if (updateData !== null && updateData !== void 0 ? updateData : true) {
             // die data has changed
             var stock = this.getDieStock(die);

@@ -622,7 +622,7 @@ class DiceStock<T> {
                 duration = this.getRand(duration[0], duration[1]);
             }
 
-            const getRandDeg = () => this.getRand(360, 540);
+            const getRandDeg = () => this.getRand(540, 720);
 
             await Promise.all([
                 // dice movement animation (slide with bumps)
