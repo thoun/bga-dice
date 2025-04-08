@@ -1,14 +1,14 @@
-let lineStock;
+let customD6LineStock;
 
-function initLineStock() {
-    lineStock = new LineDiceStock(diceManager, document.getElementById('line-stock'), {
+function initCustomD6LineStock() {
+    customD6LineStock = new LineDiceStock(customD6Manager, document.getElementById('line-stock'), {
         sort: sortFunction('type', 'type_arg'),
         direction: 'column',
         center: true,
     });
 
     // add dice
-    lineStock.addDice([
+    customD6LineStock.addDice([
         { id: getDieId(), type: 'takenokolor', type_arg: 2, location: 'table', location_arg: 0, color: '#FBB0D0' }, // pink
         { id: getDieId(), type: 'takenokolor', type_arg: 5, location: 'table', location_arg: 0, color: '#F9EC29' }, // yellow
         { id: getDieId(), type: 'takenokolor', type_arg: 12, location: 'table', location_arg: 0, color: '#75D4FE' }, // blue
@@ -17,9 +17,9 @@ function initLineStock() {
 }
 
 function roll() {
-    const dice = lineStock.getDice();
+    const dice = customD6LineStock.getDice();
     dice.forEach(die => die.value = Math.floor(Math.random() * 6) + 1);
-    lineStock.rollDice(dice, {
+    customD6LineStock.rollDice(dice, {
         effect: 'rollIn',
         duration: [800, 1200]
     });

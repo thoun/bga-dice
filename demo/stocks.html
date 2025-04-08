@@ -10,8 +10,8 @@
         <script src="../bga-dice.js" type="text/javascript"></script>
         <link href="./demo.css" rel="stylesheet"></script>
         <script src="./common.js" type="text/javascript"></script>
-        <script src="./manager.js" type="text/javascript"></script>
-        <script src="./line-stock.js" type="text/javascript"></script>
+        <script src="./d6-manager.js" type="text/javascript"></script>
+        <script src="./d6-line-stock.js" type="text/javascript"></script>
         <script src="./slot-stock.js" type="text/javascript"></script>
         <script src="./manual-position-stock.js" type="text/javascript"></script>
         <script src="./void-stock.js" type="text/javascript"></script>
@@ -27,8 +27,6 @@
                     <button onclick="addDieToLineStockWithAnimation(this, false)">Add die with default animation (slide)</button>
                     <button onclick="addDieToLineStockWithAnimation(this, true)">Add die with custom function (slide with double loop)</button>
                     <button onclick="addDieToLineStockFromVoidStock()">Add die from VoidStock</button>
-                    <div id="line-stock-overlap"></div>
-                    <div id="line-stock-vertical-overlap"></div>
                 </div>
             </div>
 
@@ -61,8 +59,8 @@
 
         <script>
             initCommon();
-            initManager();
-            initLineStock();
+            initD6Manager();
+            initD6LineStock();
             initSlotStock();
             initManualPositionDiagonalStock();
             initManualPositionCurveStock();

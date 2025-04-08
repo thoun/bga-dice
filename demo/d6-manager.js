@@ -1,4 +1,4 @@
-let diceManager;
+let d6Manager;
 
 class WhiteDie extends BgaDie6 {
     color;
@@ -17,15 +17,10 @@ class WhiteDie extends BgaDie6 {
     }
 }
 
-function initManager() {
-    diceManager = new DiceManager(game, {
+function initD6Manager() {
+    d6Manager = new DiceManager(game, {
         dieTypes: {
             0: new WhiteDie(),
         },
     });
-}
-
-let dieId = 1;
-function getDieId() {
-    return dieId++;
 }

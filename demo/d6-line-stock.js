@@ -1,17 +1,17 @@
-let lineStock;
+let d6LineStock;
 
-function initLineStock() {
-    lineStock = new LineDiceStock(diceManager, document.getElementById('line-stock'), {
+function initD6LineStock(selectable = false) {
+    d6LineStock = new LineDiceStock(d6Manager, document.getElementById('line-stock'), {
         sort: sortFunction('type', 'type_arg')
     });
-    lineStock.setSelectionMode('multiple');
-    lineStock.onSelectionChange = (selection, lastChange) => {
+    d6LineStock.setSelectionMode(selectable ? 'multiple' : 'none');
+    d6LineStock.onSelectionChange = (selection, lastChange) => {
         logDiv = document.getElementById('line-stock-last-selection-change');
         if (logDiv) {
             logDiv.innerHTML = `<br>selection = ${JSON.stringify(selection)},<br>lastChange = ${JSON.stringify(lastChange)}`;
         }
     };
-    lineStock.onDieClick = (die) => {
+    d6LineStock.onDieClick = (die) => {
         logDiv = document.getElementById('line-stock-last-click');
         if (logDiv) {
             logDiv.innerHTML = `<br>clicked die = ${JSON.stringify(die)}`;
@@ -19,7 +19,7 @@ function initLineStock() {
     };
 
     // add dice
-    lineStock.addDice([
+    d6LineStock.addDice([
         { id: getDieId(), type: 0, type_arg: 2, location: 'table', location_arg: 0 },
         { id: getDieId(), type: 0, type_arg: 5, location: 'table', location_arg: 0 },
         { id: getDieId(), type: 0, type_arg: 12, location: 'table', location_arg: 0 },
@@ -28,11 +28,11 @@ function initLineStock() {
 }
 
 function selectionTypeChange(type) {
-    lineStock.setSelectionMode(type);
+    d6LineStock.setSelectionMode(type);
 }
 
 function setSelectableDice(all) {
-    lineStock.setSelectableDice(lineStock.getDice().filter((die, index) => all ? true : index % 2));
+    d6LineStock.setSelectableDice(d6LineStock.getDice().filter((die, index) => all ? true : index % 2));
 }
 
 function addDieToLineStockWithAnimation(fromElement, customAnimation) {
@@ -45,7 +45,7 @@ function addDieToLineStockWithAnimation(fromElement, customAnimation) {
         animationSettings.animation = new BgaAnimation(stockSlideWithDoubleLoopAnimation, {});
     }
 
-    lineStock.addDie(
+    d6LineStock.addDie(
         { id: getDieId(), type: 0 + Math.floor(Math.random() * 4), type_arg: 1 + Math.floor(Math.random() * 10), location: 'table', location_arg: 0 },
         animationSettings
     );
@@ -54,5 +54,5 @@ function addDieToLineStockWithAnimation(fromElement, customAnimation) {
 function addDieToLineStockFromVoidStock() {
     const die = { id: getDieId(), type: 0 + Math.floor(Math.random() * 4), type_arg: 1 + Math.floor(Math.random() * 10), location: 'table', location_arg: 0 }
     voidStock.addDie({ id: die.id }, undefined, { remove: false, });
-    lineStock.addDie(die);
+    d6LineStock.addDie(die);
 }

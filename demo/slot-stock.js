@@ -3,7 +3,7 @@ let slotStockDie1;
 let slotStockDie2;
 
 function initSlotStock() {
-    slotStock = new SlotDiceStock(diceManager, document.getElementById('slot-stock'), {
+    slotStock = new SlotDiceStock(d6Manager, document.getElementById('slot-stock'), {
         slotsIds: ['A', 'B', 'C'],
         slotClasses: ['mygame-slot'],
         mapDieToSlot: (die) => die.location,

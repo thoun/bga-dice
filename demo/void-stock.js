@@ -1,14 +1,14 @@
 let voidStock;
 
 function initVoidStock() {
-    voidStock = new VoidDiceStock(diceManager, document.getElementById('void-stock'));
+    voidStock = new VoidDiceStock(d6Manager, document.getElementById('void-stock'));
 }
 
 function addDieToVoidStock(fromElement) {
-    if (lineStock.isEmpty()) {
+    if (d6LineStock.isEmpty()) {
         throw new Error('no die in LineStock');
     }
 
-    const die = lineStock.getDice()[0];
+    const die = d6LineStock.getDice()[0];
     voidStock.addDie(die);
 }

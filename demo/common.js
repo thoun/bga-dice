@@ -33,3 +33,8 @@ function initCommon() {
     </div>
     `)
 }
+
+let dieId = 1;
+function getDieId() {
+    return dieId++;
+}
