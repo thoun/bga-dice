@@ -38,16 +38,9 @@ h1, h2 {
     border-radius: 5px;
 }
 
-.kot-die6 .bga-dice_die-face {
-    background: url('kot-die6.png');
-    background-size: 600% 100%;
-}
-
 .kot-die4 .bga-dice_die-face {
     background: linear-gradient(90deg, lightgoldenrodyellow 0%, gold 100%);
 }
-
-
 
 .kot-die4 .bga-dice_die-face-number::after {
     position: absolute;
@@ -73,12 +66,6 @@ h1, h2 {
 }
 .kot-die4 .bga-dice_die-face-number[data-number="4"]::after {
     content: '4';
-}
-
-.white-die .bga-dice_die-face {
-    background: url('white-die.png');
-    background-size: 600% 100%;
-    border-radius: 5px;
 }
 
 .bga-dice_die .bga-dice_die-face[data-face="1"] {

@@ -23,13 +23,13 @@ interface LineStockSettings extends DieStockSettings {
 /**
  * A basic stock for a list of dice, based on flex.
  */
-class LineDiceStock extends DiceStock {
+class LineDiceStock<T> extends DiceStock<T> {
     /**
      * @param manager the die manager  
      * @param element the stock element (should be an empty HTML Element)
      * @param settings a `LineStockSettings` object
      */
-    constructor(protected manager: DiceManager, protected element: HTMLElement, settings?: LineStockSettings) {
+    constructor(protected manager: DiceManager<T>, protected element: HTMLElement, settings?: LineStockSettings) {
         super(manager, element, settings);
         element.classList.add('bga-dice_line-stock');
 

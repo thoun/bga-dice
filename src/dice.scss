@@ -5,7 +5,7 @@ body > .bga-dice_die {
 }
 
 .bga-dice_die {
-  --roll-duration: 1000ms;
+  //--roll-duration: 1000ms;
 
   flex-shrink: 0;
   position: relative;
@@ -22,8 +22,8 @@ body > .bga-dice_die {
     transform-style: preserve-3d;
     position: relative;
     display: inline-block;
-    transform: rotate3d(1, 1, 1, -720deg);   
-    transition: transform var(--roll-duration) ease-out; 
+    //transform: rotate3d(1, 1, 1, -720deg);   
+    //transition: transform var(--roll-duration) ease-out; 
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;

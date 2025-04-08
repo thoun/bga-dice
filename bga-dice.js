@@ -31,17 +31,6 @@ function sortFunction() {
         return 0;
     };
 }
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -160,46 +149,97 @@ var DiceStock = /** @class */ (function () {
      */
     DiceStock.prototype.addDie = function (die, animation, settings) {
         var _this = this;
-        var _a;
         if (!this.canAddDie(die, settings)) {
             return Promise.resolve(false);
         }
-        var promise;
         // we check if die is in a stock
+        var dieElement = this.getDieElement(die);
         var originStock = this.manager.getDieStock(die);
+        if (dieElement && !originStock) {
+            throw new Error('The die element exists but is not attached to any Stock');
+        }
+        if (dieElement) { // unselect the die
+            originStock.unselectDie(die);
+            this.removeSelectionClassesFromElement(dieElement);
+        }
+        var animationSettings = animation !== null && animation !== void 0 ? animation : {};
+        if (originStock) { // if the die is in a Stock, the animation must come from it
+            animationSettings.fromStock = originStock;
+        }
+        var addDieSettings = settings !== null && settings !== void 0 ? settings : {};
         var index = this.getNewDieIndex(die);
-        var settingsWithIndex = __assign({ index: index }, (settings !== null && settings !== void 0 ? settings : {}));
-        var updateInformations = (_a = settingsWithIndex.updateInformations) !== null && _a !== void 0 ? _a : true;
-        if (originStock === null || originStock === void 0 ? void 0 : originStock.contains(die)) {
-            var element = this.getDieElement(die);
-            promise = this.moveFromOtherStock(die, element, __assign(__assign({}, animation), { fromStock: originStock }), settingsWithIndex);
+        if (index !== undefined) {
+            addDieSettings.index = index;
         }
-        else if ((animation === null || animation === void 0 ? void 0 : animation.fromStock) && animation.fromStock.contains(die)) {
-            var element = this.getDieElement(die);
-            promise = this.moveFromOtherStock(die, element, animation, settingsWithIndex);
-        }
-        else {
-            var element = this.manager.createDieElement(die);
-            promise = this.moveFromElement(die, element, animation, settingsWithIndex);
-        }
-        if (settingsWithIndex.index !== null && settingsWithIndex.index !== undefined) {
+        if (addDieSettings.index !== null && addDieSettings.index !== undefined) {
             this.dice.splice(index, 0, die);
         }
         else {
             this.dice.push(die);
         }
-        if (updateInformations) { // after splice/push
-            this.manager.updateDieInformations(die);
-        }
-        if (!promise) {
-            console.warn("Dicetock.addDie didn't return a Promise");
-            promise = Promise.resolve(false);
+        var promise = dieElement ?
+            this.addExistingDieElement(die, dieElement, animationSettings, addDieSettings) :
+            this.addUnexistingDieElement(die, animationSettings, addDieSettings);
+        this.manager.updateDieInformations(die);
+        // if the die was from a stock, we remove the die from it. 
+        // Must be called after the animation is started, so it doesn't delete the element
+        if (animationSettings.fromStock && animationSettings.fromStock != this) {
+            animationSettings.fromStock.removeDie(die);
         }
         if (this.selectionMode !== 'none') {
             // make selectable only at the end of the animation
-            promise.then(function () { var _a; return _this.setSelectableDie(die, (_a = settingsWithIndex.selectable) !== null && _a !== void 0 ? _a : true); });
+            promise.then(function () { var _a; return _this.setSelectableDie(die, (_a = addDieSettings.selectable) !== null && _a !== void 0 ? _a : true); });
         }
         return promise;
+    };
+    DiceStock.prototype.addExistingDieElement = function (die, dieElement, animation, settings) {
+        var _a, _b, _c;
+        var toElement = (_a = settings === null || settings === void 0 ? void 0 : settings.forceToElement) !== null && _a !== void 0 ? _a : this.element;
+        var insertBefore = undefined;
+        if ((settings === null || settings === void 0 ? void 0 : settings.index) === null || (settings === null || settings === void 0 ? void 0 : settings.index) === undefined || !toElement.children.length || (settings === null || settings === void 0 ? void 0 : settings.index) >= toElement.children.length) {
+        }
+        else {
+            insertBefore = toElement.children[settings.index];
+        }
+        var promise = this.animationFromElement(die, dieElement, (_c = (_b = animation.fromStock) === null || _b === void 0 ? void 0 : _b.element) !== null && _c !== void 0 ? _c : animation.fromElement, toElement, insertBefore, animation, settings);
+        return promise;
+    };
+    DiceStock.prototype.addUnexistingDieElement = function (die, animation, settings) {
+        var dieElement = this.manager.createDieElement(die);
+        return this.addExistingDieElement(die, dieElement, animation, settings);
+    };
+    /**
+     * @param element The element to animate. The element is added to the destination stock before the animation starts.
+     * @param toElement The HTMLElement to attach the die to.
+     */
+    DiceStock.prototype.animationFromElement = function (die, element, fromElement, toElement, insertBefore, animation, settings) {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function () {
+            var result, result;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        if (!document.contains(element)) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.manager.animationManager.slideAndAttach(element, toElement, animation, insertBefore)];
+                    case 1:
+                        result = _c.sent();
+                        return [2 /*return*/, (_a = result === null || result === void 0 ? void 0 : result.played) !== null && _a !== void 0 ? _a : false];
+                    case 2:
+                        this.manager.animationManager.base.attachToElement(element, toElement, insertBefore);
+                        result = null;
+                        if (!(!animation.fromStock || settings.fadeIn)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.manager.animationManager.fadeIn(element, fromElement, animation)];
+                    case 3:
+                        result = _c.sent();
+                        return [3 /*break*/, 6];
+                    case 4: return [4 /*yield*/, this.manager.animationManager.slideIn(element, fromElement, animation)];
+                    case 5:
+                        result = _c.sent();
+                        _c.label = 6;
+                    case 6: return [2 /*return*/, (_b = result === null || result === void 0 ? void 0 : result.played) !== null && _b !== void 0 ? _b : false];
+                }
+            });
+        });
     };
     DiceStock.prototype.getNewDieIndex = function (die) {
         if (this.sort) {
@@ -225,52 +265,6 @@ var DiceStock = /** @class */ (function () {
         else {
             parent.insertBefore(dieElement, parent.children[settings.index]);
         }
-    };
-    DiceStock.prototype.moveFromOtherStock = function (die, dieElement, animation, settings) {
-        var promise;
-        var element = animation.fromStock.contains(die) ? this.manager.getDieElement(die) : animation.fromStock.element;
-        this.addDieElementToParent(dieElement, settings);
-        this.removeSelectionClassesFromElement(dieElement);
-        promise = this.animationFromElement(dieElement, element, {
-            originalSide: animation.originalSide,
-            rotationDelta: animation.rotationDelta,
-        });
-        // in the case the die was move inside the same stock we don't remove it
-        if (animation.fromStock && animation.fromStock != this) {
-            animation.fromStock.removeDie(die);
-        }
-        if (!promise) {
-            console.warn("Dicetock.moveFromOtherStock didn't return a Promise");
-            promise = Promise.resolve(false);
-        }
-        return promise;
-    };
-    DiceStock.prototype.moveFromElement = function (die, dieElement, animation, settings) {
-        var promise;
-        this.addDieElementToParent(dieElement, settings);
-        if (animation) {
-            if (animation.fromStock) {
-                promise = this.animationFromElement(dieElement, animation.fromStock.element, {
-                    originalSide: animation.originalSide,
-                    rotationDelta: animation.rotationDelta,
-                });
-                animation.fromStock.removeDie(die);
-            }
-            else if (animation.fromElement) {
-                promise = this.animationFromElement(dieElement, animation.fromElement, {
-                    originalSide: animation.originalSide,
-                    rotationDelta: animation.rotationDelta,
-                });
-            }
-        }
-        else {
-            promise = Promise.resolve(false);
-        }
-        if (!promise) {
-            console.warn("Dicetock.moveFromElement didn't return a Promise");
-            promise = Promise.resolve(false);
-        }
-        return promise;
     };
     /**
      * Add an array of dice to the stock.
@@ -525,35 +519,6 @@ var DiceStock = /** @class */ (function () {
         (_a = this.onDieClick) === null || _a === void 0 ? void 0 : _a.call(this, die);
     };
     /**
-     * @param element The element to animate. The element is added to the destination stock before the animation starts.
-     * @param fromElement The HTMLElement to animate from.
-     */
-    DiceStock.prototype.animationFromElement = function (element, fromElement, settings) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function () {
-            var side, diceides_1, result;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        side = element.dataset.side;
-                        if (settings.originalSide && settings.originalSide != side) {
-                            diceides_1 = element.getElementsByClassName('die-sides')[0];
-                            diceides_1.style.transition = 'none';
-                            element.dataset.side = settings.originalSide;
-                            setTimeout(function () {
-                                diceides_1.style.transition = null;
-                                element.dataset.side = side;
-                            });
-                        }
-                        return [4 /*yield*/, this.manager.animationManager.slideIn(element, fromElement)];
-                    case 1:
-                        result = _b.sent();
-                        return [2 /*return*/, (_a = result === null || result === void 0 ? void 0 : result.played) !== null && _a !== void 0 ? _a : false];
-                }
-            });
-        });
-    };
-    /**
      * @returns the perspective for this stock.
      */
     DiceStock.prototype.getPerspective = function () {
@@ -590,6 +555,37 @@ var DiceStock = /** @class */ (function () {
         var selectedDiceClass = this.getSelectedDieClass();
         dieElement.classList.remove(selectableDiceClass, unselectableDiceClass, selectedDiceClass);
     };
+    DiceStock.prototype.getRand = function (min, max) {
+        return Math.floor(Math.random() * ((max + 1) - min) + min);
+    };
+    DiceStock.prototype.getRollAnimation = function (element, duration, deltaYFrom, deltaYTo, moveHorizontally) {
+        if (deltaYFrom === void 0) { deltaYFrom = 0; }
+        if (deltaYTo === void 0) { deltaYTo = 0; }
+        if (moveHorizontally === void 0) { moveHorizontally = true; }
+        return __awaiter(this, void 0, void 0, function () {
+            var size, distance, horizontalMargin;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        size = this.manager.getSize();
+                        distance = deltaYTo - deltaYFrom;
+                        horizontalMargin = function () { return moveHorizontally ? _this.getRand(-size / 4, size / 4) : 0; };
+                        return [4 /*yield*/, element.animate([
+                                { transform: "translate(".concat(horizontalMargin(), "px, ").concat(deltaYFrom, "px) translateZ(").concat(size * 4, "px)") },
+                                { transform: "translate(".concat(horizontalMargin(), "px, ").concat(deltaYFrom + distance * 0.2, "px)") },
+                                { transform: "translate(".concat(horizontalMargin(), "px, ").concat(deltaYFrom + distance * 0.4, "px) translateZ(").concat(size * 3, "px)") },
+                                { transform: "translate(".concat(horizontalMargin(), "px, ").concat(deltaYFrom + distance * 0.6, "px)") },
+                                { transform: "translate(".concat(horizontalMargin(), "px, ").concat(deltaYFrom + distance * 0.8, "px) translateZ(").concat(size * 2, "px)") },
+                                { transform: "translate(0px, ".concat(deltaYTo, "px)") },
+                            ], duration).finished];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     DiceStock.prototype.addRollEffectToDieElement = function (die, element, effect, duration) {
         return __awaiter(this, void 0, void 0, function () {
             var size, _a;
@@ -604,36 +600,23 @@ var DiceStock = /** @class */ (function () {
                             case 'turn': return [3 /*break*/, 7];
                         }
                         return [3 /*break*/, 9];
-                    case 1: return [4 /*yield*/, element.animate([
-                            { transform: "translate(0px, ".concat(-size * 5, "px)") },
-                            { transform: "translate(0px, 0px)" },
-                        ], duration).finished];
+                    case 1: return [4 /*yield*/, this.getRollAnimation(element, duration, -size * 5, 0)];
                     case 2:
                         _b.sent();
-                        /*this.manager.animationManager.slideInFromDelta(
-                            element,
-                            {
-                                x: 0,
-                                y: -size * 5,
-                            }
-                        );*/
                         return [3 /*break*/, 9];
-                    case 3: return [4 /*yield*/, element.animate([
-                            { transform: "translate(0px, 0px)" },
-                            { transform: "translate(0px, ".concat(size * 5, "px)") },
-                        ], duration).finished];
+                    case 3: return [4 /*yield*/, this.getRollAnimation(element, duration, 0, size * 5)];
                     case 4:
                         _b.sent();
                         return [4 /*yield*/, element.animate([
                                 { transform: "translate(0px, ".concat(size * 5, "px)") },
                                 { transform: "translate(0px, ".concat(size * 5, "px)") },
-                            ], duration).finished];
+                            ], duration / 3).finished];
                     case 5:
                         _b.sent();
                         return [4 /*yield*/, element.animate([
                                 { transform: "translate(0px, ".concat(size * 5, "px)") },
                                 { transform: "translate(0px, 0px)" },
-                            ], duration).finished];
+                            ], duration / 3).finished];
                     case 6:
                         _b.sent();
                         return [3 /*break*/, 9];
@@ -652,30 +635,39 @@ var DiceStock = /** @class */ (function () {
     };
     DiceStock.prototype.rollDie = function (die, settings) {
         var _a, _b;
-        var div = this.getDieElement(die);
-        var faces = div.querySelector('.bga-dice_die-faces');
-        faces.style.setProperty('--roll-duration', "0");
-        faces.clientWidth;
-        faces.dataset.visibleFace = "";
-        faces.clientWidth;
-        var rollEffect = (_a = settings === null || settings === void 0 ? void 0 : settings.effect) !== null && _a !== void 0 ? _a : 'rollIn';
-        var animate = this.manager.game.bgaAnimationsActive() && rollEffect !== 'none';
-        var duration = (_b = settings === null || settings === void 0 ? void 0 : settings.duration) !== null && _b !== void 0 ? _b : 1000;
-        if (animate) {
-            if (Array.isArray(duration)) {
-                var diff = Math.abs(duration[1] - duration[0]);
-                duration = Math.min.apply(Math, duration) + Math.floor(Math.random() * diff);
-            }
-            if (rollEffect.includes('roll')) {
-                faces.style.transform = "rotate3d(".concat(Math.random() < 0.5 ? -1 : 1, ", ").concat(Math.random() < 0.5 ? -1 : 1, ", ").concat(Math.random() < 0.5 ? -1 : 1, ", ").concat(720 + Math.random() * 360, "deg)");
-                faces.clientWidth;
-            }
-            this.addRollEffectToDieElement(die, div, rollEffect, duration);
-        }
-        faces.style.setProperty('--roll-duration', "".concat(animate ? duration : 0, "ms"));
-        faces.clientWidth;
-        faces.style.removeProperty('transform');
-        faces.dataset.visibleFace = "".concat(this.manager.getDieFace(die));
+        return __awaiter(this, void 0, void 0, function () {
+            var div, faces, rollEffect, animate, duration, getRandDeg;
+            var _this = this;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        div = this.getDieElement(die);
+                        faces = div.querySelector('.bga-dice_die-faces');
+                        faces.dataset.visibleFace = "".concat(this.manager.getDieFace(die));
+                        rollEffect = (_a = settings === null || settings === void 0 ? void 0 : settings.effect) !== null && _a !== void 0 ? _a : 'rollIn';
+                        animate = this.manager.game.bgaAnimationsActive() && rollEffect !== 'none';
+                        if (!animate) return [3 /*break*/, 2];
+                        duration = (_b = settings === null || settings === void 0 ? void 0 : settings.duration) !== null && _b !== void 0 ? _b : 1000;
+                        if (Array.isArray(duration)) {
+                            duration = this.getRand(duration[0], duration[1]);
+                        }
+                        getRandDeg = function () { return _this.getRand(360, 540); };
+                        return [4 /*yield*/, Promise.all([
+                                // dice movement animation (slide with bumps)
+                                this.addRollEffectToDieElement(die, div, rollEffect, duration),
+                                // dice roll animation (roll on itself)
+                                faces.animate([
+                                    { transform: "rotateX(".concat(getRandDeg(), "deg) rotateY(").concat(getRandDeg(), "deg) rotateZ(").concat(getRandDeg(), "deg)") },
+                                    { transform: "" },
+                                ], duration).finished,
+                            ])];
+                    case 1:
+                        _c.sent();
+                        _c.label = 2;
+                    case 2: return [2 /*return*/];
+                }
+            });
+        });
     };
     return DiceStock;
 }());
@@ -719,6 +711,17 @@ var LineDiceStock = /** @class */ (function (_super) {
     }
     return LineDiceStock;
 }(DiceStock));
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
         if (ar || !(i in from)) {
@@ -819,38 +822,25 @@ var SlotDiceStock = /** @class */ (function (_super) {
      */
     SlotDiceStock.prototype.swapDice = function (dice, settings) {
         var _this = this;
-        if (!this.mapDieToSlot) {
-            throw new Error('You need to define SlotStock.mapDieToSlot to use SlotStock.swapDice');
-        }
-        var promises = [];
         var elements = dice.map(function (die) { return _this.manager.getDieElement(die); });
-        var cssPositions = elements.map(function (element) { return element.style.position; });
-        // we set to absolute so it doesn't mess with slide coordinates when 2 div are at the same place
-        elements.forEach(function (element) { return element.style.position = 'absolute'; });
         dice.forEach(function (die, index) {
-            var _a, _b;
             var dieElement = elements[index];
-            var promise;
-            var slotId = (_a = _this.mapDieToSlot) === null || _a === void 0 ? void 0 : _a.call(_this, die);
-            _this.slots[slotId].appendChild(dieElement);
-            dieElement.style.position = cssPositions[index];
             var dieIndex = _this.dice.findIndex(function (c) { return _this.manager.getId(c) == _this.manager.getId(die); });
             if (dieIndex !== -1) {
                 _this.dice.splice(dieIndex, 1, die);
             }
-            if ((_b = settings === null || settings === void 0 ? void 0 : settings.updateInformations) !== null && _b !== void 0 ? _b : true) { // after splice/push
-                _this.manager.updateDieInformations(die);
-            }
+            _this.manager.updateDieInformations(die);
             _this.removeSelectionClassesFromElement(dieElement);
-            promise = _this.animationFromElement(dieElement, elements[index], {});
-            if (!promise) {
-                console.warn("Dicetock.animationFromElement didn't return a Promise");
-                promise = Promise.resolve(false);
-            }
-            promise.then(function () { var _a; return _this.setSelectableDie(die, (_a = settings === null || settings === void 0 ? void 0 : settings.selectable) !== null && _a !== void 0 ? _a : true); });
-            promises.push(promise);
         });
-        return Promise.all(promises);
+        var promise = this.manager.animationManager.swap(elements);
+        dice.forEach(function (die, index) {
+            promise.then(function () {
+                var _a;
+                //this.manager.animationManager.base.attachToElement(dieElement, this.slots[slotId]);
+                _this.setSelectableDie(die, (_a = settings === null || settings === void 0 ? void 0 : settings.selectable) !== null && _a !== void 0 ? _a : true);
+            });
+        });
+        return promise;
     };
     return SlotDiceStock;
 }(LineDiceStock));

@@ -28,11 +28,6 @@ interface DieStockSettings {
 }
 
 interface AddDieSettings {
-    /**
-     * If the die will be on its visible side on the stock
-     */
-    visible?: boolean;
-
     forceToElement?: HTMLElement;
 
     /**
@@ -41,14 +36,14 @@ interface AddDieSettings {
     index?: number;
     
     /**
-     * If the die need to be updated. Default true, will flip the die if needed.
-     */
-    updateInformations?: boolean;
-    
-    /**
-     * Set if the die is selectable. Default is true, but will be ignored if the stock is not selectable.
+     * Set if the card is selectable. Default is true, but will be ignored if the stock is not selectable.
      */
     selectable?: boolean;
+
+    /**
+     * Indicates if we add a fade in effect when adding card (if it comes from an invisible or abstract element).
+     */
+    fadeIn?: boolean;
 }
 interface RollDieSettings {    
     /**
@@ -167,56 +162,97 @@ class DiceStock<T> {
      * @param settings a `AddDiceettings` object
      * @returns the promise when the animation is done (true if it was animated, false if it wasn't)
      */
-    public addDie(die: T, animation?: DieAnimation, settings?: AddDieSettings): Promise<boolean> {
+    public addDie(die: T, animation?: DieAnimationSettings, settings?: AddDieSettings): Promise<boolean> {
         if (!this.canAddDie(die, settings)) {
             return Promise.resolve(false);
         }
 
-        let promise: Promise<boolean>;
-
         // we check if die is in a stock
+        let dieElement = this.getDieElement(die);
         const originStock = this.manager.getDieStock(die);
 
-        const index = this.getNewDieIndex(die);
-        const settingsWithIndex: AddDieSettings = {
-            index,
-            ...(settings ?? {})
-        };
-
-        const updateInformations = settingsWithIndex.updateInformations ?? true;
-
-        if (originStock?.contains(die)) {
-            let element = this.getDieElement(die);
-            promise = this.moveFromOtherStock(die, element, { ...animation, fromStock: originStock,  }, settingsWithIndex);
-        } else if (animation?.fromStock && animation.fromStock.contains(die)) {
-            let element = this.getDieElement(die);
-            promise = this.moveFromOtherStock(die, element, animation, settingsWithIndex);
-        } else {
-            const element = this.manager.createDieElement(die);
-            promise = this.moveFromElement(die, element, animation, settingsWithIndex);
+        if (dieElement && !originStock) {
+            throw new Error('The die element exists but is not attached to any Stock');
+        }
+        if (dieElement) { // unselect the die
+            originStock.unselectDie(die);
+            this.removeSelectionClassesFromElement(dieElement);
+        }
+        const animationSettings: DieAnimationSettings = animation ?? {};
+        if (originStock) { // if the die is in a Stock, the animation must come from it
+            animationSettings.fromStock = originStock;
         }
 
-        if (settingsWithIndex.index !== null && settingsWithIndex.index !== undefined) {
+        const addDieSettings: AddDieSettings = settings ?? {};
+        const index = this.getNewDieIndex(die);
+        if (index !== undefined) {
+            addDieSettings.index = index;
+        }
+
+        if (addDieSettings.index !== null && addDieSettings.index !== undefined) {
             this.dice.splice(index, 0, die);
         } else {
             this.dice.push(die);
         }
 
-        if (updateInformations) { // after splice/push
-            this.manager.updateDieInformations(die);
-        }
+        let promise: Promise<boolean> = dieElement ? 
+            this.addExistingDieElement(die, dieElement, animationSettings, addDieSettings) : 
+            this.addUnexistingDieElement(die, animationSettings, addDieSettings);
 
-        if (!promise) {
-            console.warn(`Dicetock.addDie didn't return a Promise`);
-            promise = Promise.resolve(false);
+        this.manager.updateDieInformations(die);
+
+        // if the die was from a stock, we remove the die from it. 
+        // Must be called after the animation is started, so it doesn't delete the element
+        if (animationSettings.fromStock && animationSettings.fromStock != this) {
+            animationSettings.fromStock.removeDie(die);
         }
 
         if (this.selectionMode !== 'none') {
             // make selectable only at the end of the animation
-            promise.then(() => this.setSelectableDie(die, settingsWithIndex.selectable ?? true));
+            promise.then(() => this.setSelectableDie(die, addDieSettings.selectable ?? true));
         }
 
         return promise;
+    }
+
+    protected addExistingDieElement(die: T, dieElement: HTMLElement, animation: DieAnimationSettings, settings?: AddDieSettings): Promise<boolean> {
+        const toElement = settings?.forceToElement ?? this.element;
+
+        let insertBefore = undefined;
+        if (settings?.index === null || settings?.index === undefined || !toElement.children.length || settings?.index >= toElement.children.length) {
+        } else {
+            insertBefore = toElement.children[settings.index];
+        }
+
+        const promise = this.animationFromElement(die, dieElement, animation.fromStock?.element ?? animation.fromElement, toElement, insertBefore, animation, settings);
+
+        return promise;
+    }
+
+    protected addUnexistingDieElement(die: T, animation: DieAnimationSettings, settings?: AddDieSettings): Promise<boolean> {
+        const dieElement = this.manager.createDieElement(die);
+        return this.addExistingDieElement(die, dieElement, animation, settings);
+    }
+
+    /**
+     * @param element The element to animate. The element is added to the destination stock before the animation starts. 
+     * @param toElement The HTMLElement to attach the die to.
+     */
+    protected async animationFromElement(die: T, element: HTMLElement, fromElement: HTMLElement | null | undefined, toElement: HTMLElement, insertBefore: HTMLElement | null | undefined, animation: DieAnimationSettings, settings: AddDieSettings): Promise<boolean> {
+        if (document.contains(element)) {
+            const result = await this.manager.animationManager.slideAndAttach(element, toElement, animation, insertBefore);
+            return result?.played ?? false;
+        } else {
+            this.manager.animationManager.base.attachToElement(element, toElement, insertBefore);
+            let result = null;
+            if (!animation.fromStock || settings.fadeIn) {
+                result = await this.manager.animationManager.fadeIn(element, fromElement, animation);
+            } else {
+                result = await this.manager.animationManager.slideIn(element, fromElement, animation);
+            }            
+
+            return result?.played ?? false;
+        }
     }
 
     protected getNewDieIndex(die: T): number | undefined {
@@ -245,62 +281,6 @@ class DiceStock<T> {
         }
     }
 
-    protected moveFromOtherStock(die: T, dieElement: HTMLElement, animation: DieAnimation, settings?: AddDieSettings): Promise<boolean> {
-        let promise: Promise<boolean>;
-
-        const element = animation.fromStock.contains(die) ? this.manager.getDieElement(die) : animation.fromStock.element;
-
-        this.addDieElementToParent(dieElement, settings);
-
-        this.removeSelectionClassesFromElement(dieElement);
-
-        promise = this.animationFromElement(dieElement, element, {
-            originalSide: animation.originalSide, 
-            rotationDelta: animation.rotationDelta,
-        });
-        // in the case the die was move inside the same stock we don't remove it
-        if (animation.fromStock && animation.fromStock != this) {
-            animation.fromStock.removeDie(die);
-        }
-        
-        if (!promise) {
-            console.warn(`Dicetock.moveFromOtherStock didn't return a Promise`);
-            promise = Promise.resolve(false);
-        }
-
-        return promise;
-    }
-
-    protected moveFromElement(die: T, dieElement: HTMLElement, animation: DieAnimation, settings?: AddDieSettings): Promise<boolean> {
-        let promise: Promise<boolean>;
-
-        this.addDieElementToParent(dieElement, settings);
-    
-        if (animation) {
-            if (animation.fromStock) {
-                promise = this.animationFromElement(dieElement, animation.fromStock.element, {
-                    originalSide: animation.originalSide, 
-                    rotationDelta: animation.rotationDelta,
-                });
-                animation.fromStock.removeDie(die);
-            } else if (animation.fromElement) {
-                promise = this.animationFromElement(dieElement,  animation.fromElement, {
-                    originalSide: animation.originalSide, 
-                    rotationDelta: animation.rotationDelta,
-                });
-            }
-        } else {
-            promise = Promise.resolve(false);
-        }
-        
-        if (!promise) {
-            console.warn(`Dicetock.moveFromElement didn't return a Promise`);
-            promise = Promise.resolve(false);
-        }
-
-        return promise;
-    }
-
     /**
      * Add an array of dice to the stock.
      * 
@@ -309,7 +289,7 @@ class DiceStock<T> {
      * @param settings a `AddDiceettings` object
      * @param shift if number, the number of milliseconds between each die. if true, chain animations
      */
-    public async addDice(dice: T[], animation?: DieAnimation, settings?: AddDieSettings, shift: number | boolean = false): Promise<boolean> {
+    public async addDice(dice: T[], animation?: DieAnimationSettings, settings?: AddDieSettings, shift: number | boolean = false): Promise<boolean> {
         if (!this.manager.game.bgaAnimationsActive()) {
             shift = false;
         }
@@ -544,26 +524,6 @@ class DiceStock<T> {
     }
 
     /**
-     * @param element The element to animate. The element is added to the destination stock before the animation starts. 
-     * @param fromElement The HTMLElement to animate from.
-     */
-    protected async animationFromElement(element: HTMLElement, fromElement: HTMLElement, settings: DieAnimationSettings): Promise<boolean> {
-        const side = element.dataset.side;
-        if (settings.originalSide && settings.originalSide != side) {
-            const diceides = element.getElementsByClassName('die-sides')[0] as HTMLDivElement;
-            diceides.style.transition = 'none';
-            element.dataset.side = settings.originalSide;
-            setTimeout(() => {
-                diceides.style.transition = null;
-                element.dataset.side = side;
-            });
-        }
-
-        const result = await this.manager.animationManager.slideIn(element, fromElement);
-        return result?.played ?? false;
-    }
-
-    /**
      * @returns the perspective for this stock.
      */
     private getPerspective(): number | null {
@@ -603,35 +563,40 @@ class DiceStock<T> {
         dieElement.classList.remove(selectableDiceClass, unselectableDiceClass, selectedDiceClass);
     }
 
+    protected getRand(min: number, max: number): number {
+        return Math.floor(Math.random() * ((max + 1) - min) + min);
+    }
+
+    protected async getRollAnimation(element: Element, duration: number, deltaYFrom: number = 0, deltaYTo: number = 0, moveHorizontally: boolean = true) {
+        const size = this.manager.getSize();
+        const distance = deltaYTo - deltaYFrom;
+        const horizontalMargin = () => moveHorizontally ? this.getRand(-size / 4, size / 4) : 0;
+        await element.animate([
+            { transform: `translate(${horizontalMargin()}px, ${deltaYFrom}px) translateZ(${size * 4}px)`},
+            { transform: `translate(${horizontalMargin()}px, ${deltaYFrom + distance * 0.2}px)`},
+            { transform: `translate(${horizontalMargin()}px, ${deltaYFrom + distance * 0.4}px) translateZ(${size * 3}px)`},
+            { transform: `translate(${horizontalMargin()}px, ${deltaYFrom + distance * 0.6}px)`},
+            { transform: `translate(${horizontalMargin()}px, ${deltaYFrom + distance * 0.8}px) translateZ(${size * 2}px)`},
+            { transform: `translate(0px, ${deltaYTo}px)` },
+        ], duration).finished;
+    }
+
     protected async addRollEffectToDieElement(die: T, element: HTMLElement, effect: DiceRollEffect, duration: number) {
         const size = this.manager.getSize();
         switch (effect) {
             case 'rollIn':
-                await element.animate([
-                    { transform: `translate(0px, ${-size * 5}px)`},
-                    { transform: `translate(0px, 0px)` },
-                ], duration).finished;
-                /*this.manager.animationManager.slideInFromDelta(
-                    element,
-                    {
-                        x: 0,
-                        y: -size * 5,
-                    }
-                );*/
+                await this.getRollAnimation(element, duration, -size * 5, 0);
                 break;
             case 'rollOutPauseAndBack':
-                await element.animate([
-                    { transform: `translate(0px, 0px)` },
-                    { transform: `translate(0px, ${size * 5}px)`},
-                ], duration).finished;
+                await this.getRollAnimation(element, duration, 0, size * 5);
                 await element.animate([
                     { transform: `translate(0px, ${size * 5}px)`},
                     { transform: `translate(0px, ${size * 5}px)`},
-                ], duration).finished;
+                ], duration / 3).finished;
                 await element.animate([
                     { transform: `translate(0px, ${size * 5}px)`},
                     { transform: `translate(0px, 0px)` },
-                ], duration).finished;
+                ], duration / 3).finished;
                 break;
             case 'turn':
                 await this.manager.game.wait(duration);
@@ -643,35 +608,32 @@ class DiceStock<T> {
         dice.forEach(die => this.rollDie(die, settings));
     }
 
-    public rollDie(die: T, settings?: RollDieSettings) {
+    public async rollDie(die: T, settings?: RollDieSettings) {
         const div = this.getDieElement(die);
         const faces = div.querySelector('.bga-dice_die-faces') as HTMLElement;
 
-        faces.style.setProperty('--roll-duration', `0`);
-        faces.clientWidth;
-        faces.dataset.visibleFace = ``;
-        faces.clientWidth;
+        faces.dataset.visibleFace = `${this.manager.getDieFace(die)}`;
 
         const rollEffect = settings?.effect ?? 'rollIn';
         const animate = this.manager.game.bgaAnimationsActive() && rollEffect !== 'none';
-        let duration = settings?.duration ?? 1000;
         if (animate) {
+            let duration = settings?.duration ?? 1000;
             if (Array.isArray(duration)) {
-                const diff = Math.abs(duration[1] - duration[0]);
-                duration = Math.min(...duration) + Math.floor(Math.random() * diff);
+                duration = this.getRand(duration[0], duration[1]);
             }
 
-            if (rollEffect.includes('roll')) {
-                faces.style.transform = `rotate3d(${Math.random() < 0.5 ? -1 : 1}, ${Math.random() < 0.5 ? -1 : 1}, ${Math.random() < 0.5 ? -1 : 1}, ${720 + Math.random() * 360}deg)`;
-                faces.clientWidth;
-            }
+            const getRandDeg = () => this.getRand(360, 540);
 
-            this.addRollEffectToDieElement(die, div, rollEffect, duration);
+            await Promise.all([
+                // dice movement animation (slide with bumps)
+                this.addRollEffectToDieElement(die, div, rollEffect, duration),
+
+                // dice roll animation (roll on itself)
+                faces.animate([
+                    { transform: `rotateX(${getRandDeg()}deg) rotateY(${getRandDeg()}deg) rotateZ(${getRandDeg()}deg)`},
+                    { transform: `` },
+                ], duration).finished,
+            ]);
         }
-
-        faces.style.setProperty('--roll-duration', `${animate ? duration : 0}ms`);
-        faces.clientWidth;
-        faces.style.removeProperty('transform');
-        faces.dataset.visibleFace = `${this.manager.getDieFace(die)}`;
     }
 }

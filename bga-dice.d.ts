@@ -256,9 +256,11 @@ declare class DiceStock<T> {
     getSelectedDieClass(): string | null;
     removeSelectionClasses(die: T): void;
     removeSelectionClassesFromElement(dieElement: HTMLElement): void;
+    protected getRand(min: number, max: number): number;
+    protected getRollAnimation(element: Element, duration: number, deltaYFrom?: number, deltaYTo?: number, moveHorizontally?: boolean): Promise<void>;
     protected addRollEffectToDieElement(die: T, element: HTMLElement, effect: DiceRollEffect, duration: number): Promise<void>;
     rollDice(dice: T[], settings?: RollDieSettings): void;
-    rollDie(die: T, settings?: RollDieSettings): void;
+    rollDie(die: T, settings?: RollDieSettings): Promise<void>;
 }
 interface LineStockSettings extends DieStockSettings {
     /**
@@ -281,17 +283,17 @@ interface LineStockSettings extends DieStockSettings {
 /**
  * A basic stock for a list of dice, based on flex.
  */
-declare class LineDiceStock extends DiceStock {
-    protected manager: DiceManager;
+declare class LineDiceStock<T> extends DiceStock<T> {
+    protected manager: DiceManager<T>;
     protected element: HTMLElement;
     /**
      * @param manager the die manager
      * @param element the stock element (should be an empty HTML Element)
      * @param settings a `LineStockSettings` object
      */
-    constructor(manager: DiceManager, element: HTMLElement, settings?: LineStockSettings);
+    constructor(manager: DiceManager<T>, element: HTMLElement, settings?: LineStockSettings);
 }
-interface SlotStockSettings extends LineStockSettings {
+interface SlotStockSettings<T> extends LineStockSettings {
     /**
      * The ids for the slots (can be number or string)
      */
@@ -303,7 +305,7 @@ interface SlotStockSettings extends LineStockSettings {
     /**
      * How to place the die on a slot automatically
      */
-    mapDieToSlot?: (die: BgaDie) => SlotId;
+    mapDieToSlot?: (die: T) => SlotId;
 }
 type SlotId = number | string;
 interface AddDieToSlotSettings extends AddDieSettings {
@@ -315,19 +317,19 @@ interface AddDieToSlotSettings extends AddDieSettings {
 /**
  * A stock with fixed slots (some can be empty)
  */
-declare class SlotDiceStock extends LineDiceStock {
-    protected manager: DiceManager;
+declare class SlotDiceStock<T> extends LineDiceStock<T> {
+    protected manager: DiceManager<T>;
     protected element: HTMLElement;
     protected slotsIds: SlotId[];
     protected slots: HTMLDivElement[];
     protected slotClasses: string[];
-    protected mapDieToSlot?: (die: BgaDie) => SlotId;
+    protected mapDieToSlot?: (die: T) => SlotId;
     /**
      * @param manager the die manager
      * @param element the stock element (should be an empty HTML Element)
      * @param settings a `SlotStockSettings` object
      */
-    constructor(manager: DiceManager, element: HTMLElement, settings: SlotStockSettings);
+    constructor(manager: DiceManager<T>, element: HTMLElement, settings: SlotStockSettings<T>);
     protected createSlot(slotId: SlotId): void;
     /**
      * Add a die to the stock.
@@ -337,34 +339,34 @@ declare class SlotDiceStock extends LineDiceStock {
      * @param settings a `AddDieToSlotSettings` object
      * @returns the promise when the animation is done (true if it was animated, false if it wasn't)
      */
-    addDie(die: BgaDie, animation?: DieAnimation, settings?: AddDieToSlotSettings): Promise<boolean>;
+    addDie(die: T, animation?: DieAnimation, settings?: AddDieToSlotSettings): Promise<boolean>;
     /**
      * Change the slots ids. Will empty the stock before re-creating the slots.
      *
      * @param slotsIds the new slotsIds. Will replace the old ones.
      */
     setSlotsIds(slotsIds: SlotId[]): void;
-    protected canAddDie(die: BgaDie, settings?: AddDieToSlotSettings): boolean;
+    protected canAddDie(die: T, settings?: AddDieToSlotSettings): boolean;
     /**
      * Swap dice inside the slot stock.
      *
      * @param dice the dice to swap
      * @param settings for `updateInformations` and `selectable`
      */
-    swapDice(dice: BgaDie[], settings?: AddDieSettings): Promise<boolean[]>;
+    swapDice(dice: T[], settings?: AddDieSettings): Promise<boolean[]>;
 }
 /**
  * A stock with manually placed dice
  */
-declare class ManualPositionDiceStock extends DiceStock {
-    protected manager: DiceManager;
+declare class ManualPositionDiceStock<T> extends DiceStock<T> {
+    protected manager: DiceManager<T>;
     protected element: HTMLElement;
-    protected updateDisplay: (element: HTMLElement, dice: BgaDie[], lastDie: BgaDie, stock: ManualPositionDiceStock) => any;
+    protected updateDisplay: (element: HTMLElement, dice: T[], lastDie: T, stock: ManualPositionDiceStock<T>) => any;
     /**
      * @param manager the die manager
      * @param element the stock element (should be an empty HTML Element)
      */
-    constructor(manager: DiceManager, element: HTMLElement, settings: DieStockSettings, updateDisplay: (element: HTMLElement, dice: BgaDie[], lastDie: BgaDie, stock: ManualPositionDiceStock) => any);
+    constructor(manager: DiceManager<T>, element: HTMLElement, settings: DieStockSettings, updateDisplay: (element: HTMLElement, dice: T[], lastDie: T, stock: ManualPositionDiceStock<T>) => any);
     /**
      * Add a die to the stock.
      *
@@ -373,8 +375,8 @@ declare class ManualPositionDiceStock extends DiceStock {
      * @param settings a `AddDiceettings` object
      * @returns the promise when the animation is done (true if it was animated, false if it wasn't)
      */
-    addDie(die: BgaDie, animation?: DieAnimation, settings?: AddDieSettings): Promise<boolean>;
-    dieRemoved(die: BgaDie): void;
+    addDie(die: T, animation?: DieAnimation, settings?: AddDieSettings): Promise<boolean>;
+    dieRemoved(die: T): void;
 }
 interface AddDieToVoidStockSettings extends AddDieSettings {
     /**
@@ -387,14 +389,14 @@ interface AddDieToVoidStockSettings extends AddDieSettings {
 /**
  * A stock to make dice disappear (to automatically remove disdieed dice, or to represent a bag)
  */
-declare class VoidDiceStock extends DiceStock {
-    protected manager: DiceManager;
+declare class VoidDiceStock<T> extends DiceStock<T> {
+    protected manager: DiceManager<T>;
     protected element: HTMLElement;
     /**
      * @param manager the die manager
      * @param element the stock element (should be an empty HTML Element)
      */
-    constructor(manager: DiceManager, element: HTMLElement);
+    constructor(manager: DiceManager<T>, element: HTMLElement);
     /**
      * Add a die to the stock.
      *
@@ -403,7 +405,7 @@ declare class VoidDiceStock extends DiceStock {
      * @param settings a `AddDieToVoidStockSettings` object
      * @returns the promise when the animation is done (true if it was animated, false if it wasn't)
      */
-    addDie(die: BgaDie, animation?: DieAnimation, settings?: AddDieToVoidStockSettings): Promise<boolean>;
+    addDie(die: T, animation?: DieAnimation, settings?: AddDieToVoidStockSettings): Promise<boolean>;
 }
 interface DiceManagerSettings<T> {
     /**

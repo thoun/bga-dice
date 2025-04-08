@@ -1,4 +1,4 @@
-interface SlotStockSettings extends LineStockSettings {
+interface SlotStockSettings<T> extends LineStockSettings {
     /**
      * The ids for the slots (can be number or string)
      */
@@ -12,7 +12,7 @@ interface SlotStockSettings extends LineStockSettings {
     /**
      * How to place the die on a slot automatically
      */
-    mapDieToSlot?: (die: BgaDie) => SlotId;
+    mapDieToSlot?: (die: T) => SlotId;
 }
 
 type SlotId = number | string;
@@ -27,18 +27,18 @@ interface AddDieToSlotSettings extends AddDieSettings {
 /**
  * A stock with fixed slots (some can be empty)
  */
-class SlotDiceStock extends LineDiceStock {
+class SlotDiceStock<T> extends LineDiceStock<T> {
     protected slotsIds: SlotId[] = [];
     protected slots: HTMLDivElement[] = [];
     protected slotClasses: string[];
-    protected mapDieToSlot?: (die: BgaDie) => SlotId;
+    protected mapDieToSlot?: (die: T) => SlotId;
 
     /**
      * @param manager the die manager  
      * @param element the stock element (should be an empty HTML Element)
      * @param settings a `SlotStockSettings` object
      */
-    constructor(protected manager: DiceManager, protected element: HTMLElement, settings: SlotStockSettings) {
+    constructor(protected manager: DiceManager<T>, protected element: HTMLElement, settings: SlotStockSettings<T>) {
         super(manager, element, settings);
         element.classList.add('bga-dice_slot-stock');
 
@@ -65,7 +65,7 @@ class SlotDiceStock extends LineDiceStock {
      * @param settings a `AddDieToSlotSettings` object
      * @returns the promise when the animation is done (true if it was animated, false if it wasn't)
      */
-    public addDie(die: BgaDie, animation?: DieAnimation, settings?: AddDieToSlotSettings): Promise<boolean> {
+    public addDie(die: T, animation?: DieAnimation, settings?: AddDieToSlotSettings): Promise<boolean> {
         const slotId = settings?.slot ?? this.mapDieToSlot?.(die);
         if (slotId === undefined) {
             throw new Error(`Impossible to add die to slot : no SlotId. Add slotId to settings or set mapDieToSlot to SlotDie constructor.`);
@@ -100,7 +100,7 @@ class SlotDiceStock extends LineDiceStock {
         });
     }
 
-    protected canAddDie(die: BgaDie, settings?: AddDieToSlotSettings) {
+    protected canAddDie(die: T, settings?: AddDieToSlotSettings) {
         if (!this.contains(die)) {
             return true;
         } else {
@@ -116,49 +116,31 @@ class SlotDiceStock extends LineDiceStock {
      * @param dice the dice to swap
      * @param settings for `updateInformations` and `selectable`
      */
-    public swapDice(dice: BgaDie[], settings?: AddDieSettings) {
-        if (!this.mapDieToSlot) {
-            throw new Error('You need to define SlotStock.mapDieToSlot to use SlotStock.swapDice');
-        }
-
-        const promises: Promise<boolean>[] = [];
-
+    public swapDice(dice: T[], settings?: AddDieSettings) {
         const elements = dice.map(die => this.manager.getDieElement(die));
-        const cssPositions = elements.map(element => element.style.position);
-
-        // we set to absolute so it doesn't mess with slide coordinates when 2 div are at the same place
-        elements.forEach(element => element.style.position = 'absolute');
 
         dice.forEach((die, index) => {
             const dieElement = elements[index];
-
-            let promise: Promise<boolean>;
-            const slotId = this.mapDieToSlot?.(die);
-            this.slots[slotId].appendChild(dieElement);
-            dieElement.style.position = cssPositions[index];
 
             const dieIndex = this.dice.findIndex(c => this.manager.getId(c) == this.manager.getId(die));
             if (dieIndex !== -1) {
                 this.dice.splice(dieIndex, 1, die);
             }
     
-            if (settings?.updateInformations ?? true) { // after splice/push
-                this.manager.updateDieInformations(die);
-            }
+            this.manager.updateDieInformations(die);
 
             this.removeSelectionClassesFromElement(dieElement);
-            promise = this.animationFromElement(dieElement, elements[index], {});
-            
-            if (!promise) {
-                console.warn(`Dicetock.animationFromElement didn't return a Promise`);
-                promise = Promise.resolve(false);
-            }
-
-            promise.then(() => this.setSelectableDie(die, settings?.selectable ?? true));
-
-            promises.push(promise);
         });
 
-        return Promise.all(promises);
+        const promise = this.manager.animationManager.swap(elements);
+
+        dice.forEach((die, index) => {
+            promise.then(() => {
+                //this.manager.animationManager.base.attachToElement(dieElement, this.slots[slotId]);
+                this.setSelectableDie(die, settings?.selectable ?? true);
+            });
+        });
+
+        return promise;
     }
 }

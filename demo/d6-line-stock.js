@@ -42,7 +42,12 @@ function addDieToLineStockWithAnimation(fromElement, customAnimation) {
     };
 
     if (customAnimation) {
-        animationSettings.animation = new BgaAnimation(stockSlideWithDoubleLoopAnimation, {});
+        animationSettings.parallelAnimations = [{
+            keyframes: [
+                { transform: 'rotate(0deg)' },
+                { transform: 'rotate(720deg)' }
+            ]
+        }];
     }
 
     d6LineStock.addDie(

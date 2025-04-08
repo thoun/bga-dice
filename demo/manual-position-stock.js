@@ -89,3 +89,20 @@ function initManualPositionCurveStock() {
         { id: getDieId(), type: 0, type_arg: 2, location: 'table', location_arg: 0, face: 1, },
     ]);
 }
+
+function addDieToManualCurveStock(fromElement) {
+    manualPositionCurveStock.addDie(
+        { id: getDieId(), type: 3, type_arg: 2, location: 'table', location_arg: 0, face: 6 },
+        {
+            fromElement: fromElement,
+            originalSide: 'back'
+        }
+    );
+}
+
+function removeDieToManualCurveStock() {
+    if (!manualPositionCurveStock.isEmpty()) {
+        manualPositionCurveStock.removeDie(manualPositionCurveStock.getDice()[0]);
+    }
+}
+

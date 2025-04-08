@@ -10,13 +10,13 @@ interface AddDieToVoidStockSettings extends AddDieSettings {
 /**
  * A stock to make dice disappear (to automatically remove disdieed dice, or to represent a bag)
  */
-class VoidDiceStock extends DiceStock {
+class VoidDiceStock<T> extends DiceStock<T> {
 
     /**
      * @param manager the die manager  
      * @param element the stock element (should be an empty HTML Element)
      */
-    constructor(protected manager: DiceManager, protected element: HTMLElement) {
+    constructor(protected manager: DiceManager<T>, protected element: HTMLElement) {
         super(manager, element);
         element.classList.add('bga-dice_void-stock');
     }
@@ -29,7 +29,7 @@ class VoidDiceStock extends DiceStock {
      * @param settings a `AddDieToVoidStockSettings` object
      * @returns the promise when the animation is done (true if it was animated, false if it wasn't)
      */
-    public addDie(die: BgaDie, animation?: DieAnimation, settings?: AddDieToVoidStockSettings): Promise<boolean> {
+    public addDie(die: T, animation?: DieAnimation, settings?: AddDieToVoidStockSettings): Promise<boolean> {
         let promise = super.addDie(die, animation, settings);
 
         // center the element
