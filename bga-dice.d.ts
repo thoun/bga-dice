@@ -33,98 +33,6 @@ interface BgaDie {
     id: number;
     face: number;
 }
-interface BgaDieType {
-    facesCount: number;
-    size?: number;
-    /**
-     * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.
-     *
-     * @param die the die informations
-     * @param element the die main Div element
-     */
-    setupDieDiv: (die: BgaDie, element: HTMLDivElement) => void;
-    /**
-     * Allow to populate a face div of the die. You can set classes or dataset to show the correct die face.
-     *
-     * @param die the die informations
-     * @param element the die face Div element
-     * @param face the face number (1-indexed)
-     */
-    setupFaceDiv?: (die: BgaDie, element: HTMLDivElement, face: number) => void;
-}
-interface BgaDie4Settings {
-    /**
-     *
-     */
-    showValueOverlay?: boolean;
-}
-declare const BGA_DIE4_FACE_NUMBERS: {
-    1: number[];
-    2: number[];
-    3: number[];
-    4: number[];
-};
-declare class BgaDie4 implements BgaDieType {
-    protected settings?: BgaDie4Settings;
-    facesCount: number;
-    protected showValueOverlay: boolean;
-    /**
-     * Create the die type.
-     *
-     * @param settings the die settings
-     */
-    constructor(settings?: BgaDie4Settings);
-    /**
-     * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.
-     *
-     * @param die the die informations
-     * @param element the die main Div element
-     */
-    setupDieDiv(die: BgaDie, element: HTMLDivElement): void;
-    /**
-     * Allow to populate a face div of the die. You can set classes or dataset to show the correct die face.
-     *
-     * @param die the die informations
-     * @param element the die face Div element
-     * @param face the face number (1-indexed)
-     */
-    setupFaceDiv(die: BgaDie, element: HTMLDivElement, face: number): void;
-}
-interface BgaDie6Settings {
-    /**
-     * The border radius, in %.
-     * Default 0.
-     */
-    borderRadius?: number;
-}
-declare class BgaDie6 implements BgaDieType {
-    protected settings?: BgaDie6Settings;
-    facesCount: number;
-    protected borderRadius: number;
-    /**
-     * Create the die type.
-     *
-     * @param settings the die settings
-     */
-    constructor(settings?: BgaDie6Settings);
-    /**
-     * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.
-     *
-     * @param die the die informations
-     * @param element the die main Div element
-     */
-    setupDieDiv(die: BgaDie, element: HTMLDivElement): void;
-}
-declare class BgaDie8 implements BgaDieType {
-    facesCount: number;
-    /**
-     * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.
-     *
-     * @param die the die informations
-     * @param element the die main Div element
-     */
-    setupDieDiv(die: BgaDie, element: HTMLDivElement): void;
-}
 interface DieStockSettings {
     /**
      * Indicate the die sorting (unset means no sorting, new dice will be added at the end).
@@ -184,12 +92,12 @@ type DiceRollEffect = 'rollIn' | 'rollInBump' | 'rollOutPauseAndBack' | 'rollOut
 /**
  * The abstract stock. It shouldn't be used directly, use stocks that extends it.
  */
-declare class DiceStock {
-    protected manager: DiceManager;
+declare class DiceStock<T> {
+    protected manager: DiceManager<T>;
     protected element: HTMLElement;
     private settings?;
-    protected dice: BgaDie[];
-    protected selectedDice: BgaDie[];
+    protected dice: T[];
+    protected selectedDice: T[];
     protected selectionMode: DiceSelectionMode;
     protected sort?: SortFunction;
     /**
@@ -198,22 +106,22 @@ declare class DiceStock {
      * selection: the selected dice of the stock
      * lastChange: the last change on selection die (can be selected or unselected)
      */
-    onSelectionChange?: (selection: BgaDie[], lastChange: BgaDie | null) => void;
+    onSelectionChange?: (selection: T[], lastChange: T | null) => void;
     /**
      * Called when selection change. Returns the clicked die.
      *
      * die: the clicked die (can be selected or unselected)
      */
-    onDieClick?: (die: BgaDie) => void;
+    onDieClick?: (die: T) => void;
     /**
      * @param manager the die manager
      * @param element the stock element (should be an empty HTML Element)
      */
-    constructor(manager: DiceManager, element: HTMLElement, settings?: DieStockSettings);
+    constructor(manager: DiceManager<T>, element: HTMLElement, settings?: DieStockSettings);
     /**
      * @returns the dice on the stock
      */
-    getDice(): BgaDie[];
+    getDice(): T[];
     /**
      * @returns if the stock is empty
      */
@@ -221,21 +129,21 @@ declare class DiceStock {
     /**
      * @returns the selected dice
      */
-    getSelection(): BgaDie[];
+    getSelection(): T[];
     /**
      * @returns the selected dice
      */
-    isSelected(die: BgaDie): boolean;
+    isSelected(die: T): boolean;
     /**
      * @param die a die
      * @returns if the die is present in the stock
      */
-    contains(die: BgaDie): boolean;
+    contains(die: T): boolean;
     /**
      * @param die a die in the stock
      * @returns the HTML element generated for the die
      */
-    getDieElement(die: BgaDie): HTMLElement;
+    getDieElement(die: T): HTMLElement;
     /**
      * Checks if the die can be added. By default, only if it isn't already present in the stock.
      *
@@ -243,7 +151,7 @@ declare class DiceStock {
      * @param settings the addDie settings
      * @returns if the die can be added
      */
-    protected canAddDie(die: BgaDie, settings?: AddDieSettings): boolean;
+    protected canAddDie(die: T, settings?: AddDieSettings): boolean;
     /**
      * Add a die to the stock.
      *
@@ -252,11 +160,11 @@ declare class DiceStock {
      * @param settings a `AddDiceettings` object
      * @returns the promise when the animation is done (true if it was animated, false if it wasn't)
      */
-    addDie(die: BgaDie, animation?: DieAnimation, settings?: AddDieSettings): Promise<boolean>;
-    protected getNewDieIndex(die: BgaDie): number | undefined;
+    addDie(die: T, animation?: DieAnimation, settings?: AddDieSettings): Promise<boolean>;
+    protected getNewDieIndex(die: T): number | undefined;
     protected addDieElementToParent(dieElement: HTMLElement, settings?: AddDieSettings): void;
-    protected moveFromOtherStock(die: BgaDie, dieElement: HTMLElement, animation: DieAnimation, settings?: AddDieSettings): Promise<boolean>;
-    protected moveFromElement(die: BgaDie, dieElement: HTMLElement, animation: DieAnimation, settings?: AddDieSettings): Promise<boolean>;
+    protected moveFromOtherStock(die: T, dieElement: HTMLElement, animation: DieAnimation, settings?: AddDieSettings): Promise<boolean>;
+    protected moveFromElement(die: T, dieElement: HTMLElement, animation: DieAnimation, settings?: AddDieSettings): Promise<boolean>;
     /**
      * Add an array of dice to the stock.
      *
@@ -265,25 +173,25 @@ declare class DiceStock {
      * @param settings a `AddDiceettings` object
      * @param shift if number, the number of milliseconds between each die. if true, chain animations
      */
-    addDice(dice: BgaDie[], animation?: DieAnimation, settings?: AddDieSettings, shift?: number | boolean): Promise<boolean>;
+    addDice(dice: T[], animation?: DieAnimation, settings?: AddDieSettings, shift?: number | boolean): Promise<boolean>;
     /**
      * Remove a die from the stock.
      *
      * @param die die die to remove
      */
-    removeDie(die: BgaDie): void;
+    removeDie(die: T): void;
     /**
      * Notify the stock that a die is removed.
      *
      * @param die the die to remove
      */
-    dieRemoved(die: BgaDie): void;
+    dieRemoved(die: T): void;
     /**
      * Remove a set of dice from the stock.
      *
      * @param dice the dice to remove
      */
-    removeDice(dice: BgaDie[]): void;
+    removeDice(dice: T[]): void;
     /**
      * Remove all dice from the stock.
      */
@@ -295,26 +203,26 @@ declare class DiceStock {
      * @param selectionMode the selection mode
      * @param selectableDice the selectable dice (all if unset). Calls `setSelectableDice` method
      */
-    setSelectionMode(selectionMode: DiceSelectionMode, selectableDice?: BgaDie[]): void;
-    protected setSelectableDie(die: BgaDie, selectable: boolean): void;
+    setSelectionMode(selectionMode: DiceSelectionMode, selectableDice?: T[]): void;
+    protected setSelectableDie(die: T, selectable: boolean): void;
     /**
      * Set the selectable class for each die.
      *
      * @param selectableDice the selectable dice. If unset, all dice are marked selectable. Default unset.
      */
-    setSelectableDice(selectableDice?: BgaDie[]): void;
+    setSelectableDice(selectableDice?: T[]): void;
     /**
      * Set selected state to a die.
      *
      * @param die the die to select
      */
-    selectDie(die: BgaDie, silent?: boolean): void;
+    selectDie(die: T, silent?: boolean): void;
     /**
      * Set unselected state to a die.
      *
      * @param die the die to unselect
      */
-    unselectDie(die: BgaDie, silent?: boolean): void;
+    unselectDie(die: T, silent?: boolean): void;
     /**
      * Select all dice
      */
@@ -324,7 +232,7 @@ declare class DiceStock {
      */
     unselectAll(silent?: boolean): void;
     protected bindClick(): void;
-    protected dieClick(die: BgaDie): void;
+    protected dieClick(die: T): void;
     /**
      * @param element The element to animate. The element is added to the destination stock before the animation starts.
      * @param fromElement The HTMLElement to animate from.
@@ -346,11 +254,11 @@ declare class DiceStock {
      * @returns the class to apply to selected dice. Use class from manager is unset.
      */
     getSelectedDieClass(): string | null;
-    removeSelectionClasses(die: BgaDie): void;
+    removeSelectionClasses(die: T): void;
     removeSelectionClassesFromElement(dieElement: HTMLElement): void;
-    protected addRollEffectToDieElement(die: BgaDie, element: HTMLElement, effect: DiceRollEffect, duration: number): Promise<void>;
-    rollDice(dice: BgaDie[], settings?: RollDieSettings): void;
-    rollDie(die: BgaDie, settings?: RollDieSettings): void;
+    protected addRollEffectToDieElement(die: T, element: HTMLElement, effect: DiceRollEffect, duration: number): Promise<void>;
+    rollDice(dice: T[], settings?: RollDieSettings): void;
+    rollDie(die: T, settings?: RollDieSettings): void;
 }
 interface LineStockSettings extends DieStockSettings {
     /**
@@ -497,14 +405,62 @@ declare class VoidDiceStock extends DiceStock {
      */
     addDie(die: BgaDie, animation?: DieAnimation, settings?: AddDieToVoidStockSettings): Promise<boolean>;
 }
-interface DiceManagerSettings {
+interface DiceManagerSettings<T> {
+    /**
+     * The type of dice, if you game has multiple dice types (each dice manager should have a different type).
+     * Default `${yourgamename}-dice`.
+     *
+     * The die element will have this type as a class, and each face will have the class `${type}-face-${number}`.
+     */
+    type?: string;
+    /**
+     * The number of faces of the die (default 6).
+     */
+    faces?: number;
+    /**
+     * The size of the die, in px (default 50).
+     */
+    size?: number;
+    /**
+     * The border radius, in % (default 0).
+     */
+    borderRadius?: number;
+    /**
+     * Define the id that will be set to each die div. It must return a unique id for each different die, so it's often linked to die id.
+     *
+     * Default: the id will be set to `die.id`.
+     *
+     * @param die the die informations
+     * @return the id for a die
+     */
+    getId?: (die: T) => string | number;
+    /**
+     * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.
+     *
+     * @param die the die informations
+     * @param element the die main Div element
+     */
+    setupDieDiv?: (die: T, element: HTMLDivElement) => void;
+    /**
+     * Allow to populate a face div of the die. You can set classes or dataset to show the correct die face.
+     *
+     * @param die the die informations
+     * @param element the die face Div element
+     * @param face the face number (1-indexed)
+     */
+    setupFaceDiv?: (die: T, element: HTMLDivElement, face: number) => void;
+    /**
+     * Return the die face.
+     * Default: the face will be set to `die.face`.
+     *
+     * @param die the die informations
+     * @return the die face
+     */
+    getDieFace?: (die: T) => number;
     /**
      * The animation manager used in the game. If not provided, a new one will be instanciated for this die manager. Useful if you use AnimationManager outside of dice manager, to avoid double instanciation.
      */
     animationManager?: AnimationManager;
-    dieTypes?: {
-        [dieType: number | string]: BgaDieType;
-    };
     /**
      * Perspective effect on Stock elements. Default 1000px. Can be overriden on each stock.
      */
@@ -522,46 +478,68 @@ interface DiceManagerSettings {
      */
     selectedDieClass?: string | null;
 }
-declare class DiceManager {
+declare class DiceManager<T> {
     game: Game;
     private settings;
     animationManager: AnimationManager;
     private stocks;
-    private registeredDieTypes;
     /**
      * @param game the BGA game class, usually it will be `this`
      * @param settings: a `DieManagerSettings` object
      */
-    constructor(game: Game, settings: DiceManagerSettings);
-    addStock(stock: DiceStock): void;
-    setDieType(type: number | string, dieType: BgaDieType): void;
-    getDieType(die: BgaDie): BgaDieType;
-    getId(die: BgaDie): string;
-    createDieElement(die: BgaDie): HTMLDivElement;
+    constructor(game: Game, settings: DiceManagerSettings<T>);
+    addStock(stock: DiceStock<T>): void;
+    getFaces(): number;
+    getSize(): number;
+    getBorderRadius(): number;
+    /**
+     * @param die the die informations
+     * @return the id for a die
+     */
+    getId(die: T): string | number;
+    /**
+     * @param card the card informations
+     * @return the id for a card element
+     */
+    getDieElementId(die: T): string;
+    /**
+     *
+     * @returns the type of the dice, either set in the settings or by using game_name if there is only 1 type.
+     */
+    getType(): string;
+    /**
+     * Return the die face.
+     * Default: the face will be set to `die.face`.
+     *
+     * @param die the die informations
+     * @return the die face
+     */
+    getDieFace(die: T): number;
+    createDieElement(die: T): HTMLDivElement;
     /**
      * @param die the die informations
      * @return the HTML element of an existing die
      */
-    getDieElement(die: BgaDie): HTMLElement;
+    getDieElement(die: T): HTMLElement;
     /**
      * Remove a die.
      *
      * @param die the die to remove
      */
-    removeDie(die: BgaDie): boolean;
+    removeDie(die: T): boolean;
     /**
      * Returns the stock containing the die.
      *
      * @param die the die informations
      * @return the stock containing the die
      */
-    getDieStock(die: BgaDie): DiceStock;
+    getDieStock(die: T): DiceStock<T>;
     /**
      * Update the die informations. Used when a change visible face.
      *
      * @param die the die informations
      */
-    updateDieInformations(die: BgaDie, updateData?: boolean): void;
+    updateDieInformations(die: T, updateData?: boolean): void;
     /**
      * @returns the default perspective for all stocks.
      */

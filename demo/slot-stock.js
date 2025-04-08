@@ -9,8 +9,8 @@ function initSlotStock() {
         mapDieToSlot: (die) => die.location,
     });
 
-    slotStockDie1 = { id: getDieId(), type: 0, type_arg: 2, location: 'A', location_arg: 0 };
-    slotStockDie2 = { id: getDieId(), type: 0, type_arg: 5, location: 'C', location_arg: 0 };
+    slotStockDie1 = { id: getDieId(), type: 0, type_arg: 2, location: 'A', location_arg: 0, face: 3, };
+    slotStockDie2 = { id: getDieId(), type: 0, type_arg: 5, location: 'C', location_arg: 0, face: 2, };
 
     // add dice
     slotStock.addDice([

@@ -20,10 +20,10 @@ function initD6LineStock(selectable = false) {
 
     // add dice
     d6LineStock.addDice([
-        { id: getDieId(), type: 0, type_arg: 2, location: 'table', location_arg: 0 },
-        { id: getDieId(), type: 0, type_arg: 5, location: 'table', location_arg: 0 },
-        { id: getDieId(), type: 0, type_arg: 12, location: 'table', location_arg: 0 },
-        { id: getDieId(), type: 0, type_arg: 9, location: 'table', location_arg: 0 },
+        { id: getDieId(), type: 0, type_arg: 2, location: 'table', location_arg: 0, face: 2, },
+        { id: getDieId(), type: 0, type_arg: 5, location: 'table', location_arg: 0, face: 5, },
+        { id: getDieId(), type: 0, type_arg: 12, location: 'table', location_arg: 0, face: 3, },
+        { id: getDieId(), type: 0, type_arg: 9, location: 'table', location_arg: 0, face: 4, },
     ]);
 }
 

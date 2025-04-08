@@ -1,10 +1,67 @@
-interface DiceManagerSettings {
+interface DiceManagerSettings<T> {
+    /**
+     * The type of dice, if you game has multiple dice types (each dice manager should have a different type).
+     * Default `${yourgamename}-dice`.
+     * 
+     * The die element will have this type as a class, and each face will have the class `${type}-face-${number}`.
+     */
+    type?: string;
+
+    /**
+     * The number of faces of the die (default 6).
+     */
+    faces?: number;
+
+    /**
+     * The size of the die, in px (default 50).
+     */
+    size?: number;
+
+    /**
+     * The border radius, in % (default 0).
+     */
+    borderRadius?: number;
+
+    /**
+     * Define the id that will be set to each die div. It must return a unique id for each different die, so it's often linked to die id.
+     * 
+     * Default: the id will be set to `die.id`.
+     * 
+     * @param die the die informations
+     * @return the id for a die
+     */
+    getId?: (die: T) => string | number;
+
+    /**
+     * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.
+     * 
+     * @param die the die informations
+     * @param element the die main Div element
+     */
+    setupDieDiv?: (die: T, element: HTMLDivElement) => void;
+
+    /**
+     * Allow to populate a face div of the die. You can set classes or dataset to show the correct die face.
+     * 
+     * @param die the die informations
+     * @param element the die face Div element
+     * @param face the face number (1-indexed)
+     */
+    setupFaceDiv?: (die: T, element: HTMLDivElement, face: number) => void;
+
+    /** 
+     * Return the die face.
+     * Default: the face will be set to `die.face`.
+     * 
+     * @param die the die informations
+     * @return the die face
+     */
+    getDieFace?: (die: T) => number;
+
     /**
      * The animation manager used in the game. If not provided, a new one will be instanciated for this die manager. Useful if you use AnimationManager outside of dice manager, to avoid double instanciation.
      */
     animationManager?: AnimationManager;
-
-    dieTypes?: {[dieType: number | string]: BgaDieType };
 
     /**
      * Perspective effect on Stock elements. Default 1000px. Can be overriden on each stock.
@@ -27,69 +84,101 @@ interface DiceManagerSettings {
     selectedDieClass?: string | null;
 }
 
-class DiceManager {
+class DiceManager<T> {
     public animationManager: AnimationManager;
 
-    private stocks: DiceStock[] = [];
-
-    private registeredDieTypes: BgaDieType[] = [];
+    private stocks: DiceStock<T>[] = [];
 
     /**
      * @param game the BGA game class, usually it will be `this`
      * @param settings: a `DieManagerSettings` object
      */
-    constructor(public game: Game, private settings: DiceManagerSettings) {
+    constructor(public game: Game, private settings: DiceManagerSettings<T>) {
         this.animationManager = settings.animationManager ?? new AnimationManager(game);
 
-        if (settings.dieTypes) {
-            Object.entries(settings.dieTypes).forEach(entry => this.setDieType(entry[0], entry[1]));
+        if (![4, 6, 8].includes(this.getFaces())) {
+            throw new Error('Unsupported settings.faces');
         }
     }
 
-    public addStock(stock: DiceStock) {
+    public addStock(stock: DiceStock<T>) {
         this.stocks.push(stock);
     }
-    
-    public setDieType(type: number | string, dieType: BgaDieType) {
-        this.registeredDieTypes[type] = dieType;
-    }
-    
-    public getDieType(die: BgaDie): BgaDieType {
-        return this.registeredDieTypes[die.type];
+
+    public getFaces(): number {
+        return this.settings.faces ?? 6;
     }
 
-    public getId(die: BgaDie): string {
-        return `bga-die-${die.type}-${die.id}`;
+    public getSize(): number {
+        return this.settings.size ?? 50;
     }
 
-    public createDieElement(die: BgaDie): HTMLDivElement {
-        const id = this.getId(die);
+    public getBorderRadius(): number {
+        return this.settings.borderRadius ?? 0;
+    }
+
+    /**
+     * @param die the die informations
+     * @return the id for a die
+     */
+    public getId(die: T): string | number {
+        return this.settings.getId?.(die) ?? `${(die as any).id}`;
+    }
+
+    /**
+     * @param card the card informations
+     * @return the id for a card element
+     */
+    public getDieElementId(die: T): string {
+        return `${this.getType()}-${this.getId(die)}`;
+    }
+
+    /**
+     * 
+     * @returns the type of the dice, either set in the settings or by using game_name if there is only 1 type.
+     */
+    public getType(): string {
+        return this.settings.type ?? `${(this.game as any).game_name}-dice`;
+    }
+
+    /** 
+     * Return the die face.
+     * Default: the face will be set to `die.face`.
+     * 
+     * @param die the die informations
+     * @return the die face
+     */
+    public getDieFace(die: T): number {
+        return this.settings.getDieFace?.(die) ?? (die as any).face;
+    }
+
+    public createDieElement(die: T): HTMLDivElement {
+        const id = this.getDieElementId(die);
 
         if (this.getDieElement(die)) {
             throw new Error(`This die already exists ${JSON.stringify(die)}`);
         }
 
-        const dieType: BgaDieType = this.registeredDieTypes[die.type];
-        if (!dieType) {
-            throw new Error(`This die type doesn't exists ${die.type}`);
-        }
+        const faces = this.getFaces();
+        const type = this.getType();
 
         const element = document.createElement("div");
         element.id = id;
-        element.classList.add('bga-dice_die');
-        element.style.setProperty('--size', `${dieType.size ?? 50}px`);
+        element.classList.add('bga-dice_die', `bga-dice_die${faces}`, type);
+        element.style.setProperty('--size', `${this.getSize()}px`);
+        element.style.setProperty('--bga-dice_border-radius', `${this.getBorderRadius()}%`);
         
         const dieFaces = document.createElement("div");
         dieFaces.classList.add('bga-dice_die-faces');
-        dieFaces.dataset.visibleFace = ''+die.face;
+        dieFaces.dataset.visibleFace = ''+this.getDieFace(die);
         element.appendChild(dieFaces);
         
         const facesElements = [];
 
-        for (let i = 1; i <= dieType.facesCount; i++) {            
+        for (let i = 1; i <= faces; i++) {            
             facesElements[i] = document.createElement("div");
             facesElements[i].id = `${id}-face-${i}`;
-            facesElements[i].classList.add('bga-dice_die-face');
+            facesElements[i].classList.add('bga-dice_die-face', `${type}-face-${i}`);
             facesElements[i].dataset.face = ''+i;
             dieFaces.appendChild(facesElements[i]);
             element.dataset.face = ''+i;
@@ -97,10 +186,10 @@ class DiceManager {
         
 
         document.body.appendChild(element);
-        dieType.setupDieDiv?.(die, element);
-        if (dieType.setupFaceDiv) {
-            for (let i = 1; i <= dieType.facesCount; i++) {            
-                dieType.setupFaceDiv?.(die, facesElements[i], i);
+        this.settings.setupDieDiv?.(die, element);
+        if (this.settings.setupFaceDiv) {
+            for (let i = 1; i <= faces; i++) {            
+                this.settings.setupFaceDiv(die, facesElements[i], i);
             }
         }
         document.body.removeChild(element);
@@ -111,8 +200,8 @@ class DiceManager {
      * @param die the die informations
      * @return the HTML element of an existing die
      */
-    public getDieElement(die: BgaDie): HTMLElement {
-        return document.getElementById(this.getId(die));
+    public getDieElement(die: T): HTMLElement {
+        return document.getElementById(this.getDieElementId(die));
     }
 
     /**
@@ -120,14 +209,13 @@ class DiceManager {
      * 
      * @param die the die to remove
      */
-    public removeDie(die: BgaDie) {
-        const id = this.getId(die);
-        const div = document.getElementById(id);
+    public removeDie(die: T) {
+        const div = this.getDieElement(die);
         if (!div) {
             return false;
         }
 
-        div.id = `deleted${id}`;
+        div.id = `deleted-${div.id}`;
         div.remove();
 
         // if the die is in a stock, notify the stock about removal
@@ -142,7 +230,7 @@ class DiceManager {
      * @param die the die informations
      * @return the stock containing the die
      */
-    public getDieStock(die: BgaDie): DiceStock {
+    public getDieStock(die: T): DiceStock<T> {
         return this.stocks.find(stock => stock.contains(die));
     }
 
@@ -151,9 +239,9 @@ class DiceManager {
      * 
      * @param die the die informations
      */
-    public updateDieInformations(die: BgaDie, updateData?: boolean): void {
+    public updateDieInformations(die: T, updateData?: boolean): void {
         const div = this.getDieElement(die);
-        div.dataset.visibleFace = ''+die.face;
+        div.dataset.visibleFace = ''+this.getDieFace(die);
 
         if (updateData ?? true) {
             // die data has changed

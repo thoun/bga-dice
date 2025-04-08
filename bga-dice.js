@@ -31,89 +31,6 @@ function sortFunction() {
         return 0;
     };
 }
-var BGA_DIE4_FACE_NUMBERS = {
-    1: [2, 4, 3],
-    2: [1, 3, 4],
-    3: [1, 4, 2],
-    4: [1, 2, 3],
-};
-var BgaDie4 = /** @class */ (function () {
-    /**
-     * Create the die type.
-     *
-     * @param settings the die settings
-     */
-    function BgaDie4(settings) {
-        var _a;
-        this.settings = settings;
-        this.facesCount = 4;
-        this.showValueOverlay = (_a = settings === null || settings === void 0 ? void 0 : settings.showValueOverlay) !== null && _a !== void 0 ? _a : false;
-    }
-    /**
-     * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.
-     *
-     * @param die the die informations
-     * @param element the die main Div element
-     */
-    BgaDie4.prototype.setupDieDiv = function (die, element) {
-        element.classList.add('bga-dice_die4');
-    };
-    /**
-     * Allow to populate a face div of the die. You can set classes or dataset to show the correct die face.
-     *
-     * @param die the die informations
-     * @param element the die face Div element
-     * @param face the face number (1-indexed)
-     */
-    BgaDie4.prototype.setupFaceDiv = function (die, element, face) {
-        for (var i = 0; i < 3; i++) {
-            var number = document.createElement('div');
-            number.classList.add('bga-dice_die-face-number');
-            number.dataset.number = "".concat(BGA_DIE4_FACE_NUMBERS[face][i]);
-            element.appendChild(number);
-        }
-    };
-    return BgaDie4;
-}());
-var BgaDie6 = /** @class */ (function () {
-    /**
-     * Create the die type.
-     *
-     * @param settings the die settings
-     */
-    function BgaDie6(settings) {
-        var _a;
-        this.settings = settings;
-        this.facesCount = 6;
-        this.borderRadius = (_a = settings === null || settings === void 0 ? void 0 : settings.borderRadius) !== null && _a !== void 0 ? _a : 0;
-    }
-    /**
-     * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.
-     *
-     * @param die the die informations
-     * @param element the die main Div element
-     */
-    BgaDie6.prototype.setupDieDiv = function (die, element) {
-        element.classList.add('bga-dice_die6');
-        element.style.setProperty('--bga-dice_border-radius', "".concat(this.borderRadius, "%"));
-    };
-    return BgaDie6;
-}());
-var BgaDie8 = /** @class */ (function () {
-    function BgaDie8() {
-        this.facesCount = 8;
-    }
-    /**
-     * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.
-     *
-     * @param die the die informations
-     * @param element the die main Div element
-     */
-    BgaDie8.prototype.setupDieDiv = function (die, element) {
-        element.classList.add('bga-dice_die8');
-    };
-    return BgaDie8;
-}());
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -586,7 +503,7 @@ var DiceStock = /** @class */ (function () {
             if (!dieDiv) {
                 return;
             }
-            var die = _this.dice.find(function (c) { return _this.manager.getId(c) == dieDiv.id; });
+            var die = _this.dice.find(function (c) { return _this.manager.getDieElementId(c) == dieDiv.id; });
             if (!die) {
                 return;
             }
@@ -674,55 +591,55 @@ var DiceStock = /** @class */ (function () {
         dieElement.classList.remove(selectableDiceClass, unselectableDiceClass, selectedDiceClass);
     };
     DiceStock.prototype.addRollEffectToDieElement = function (die, element, effect, duration) {
-        var _a, _b, _c, _d, _e;
         return __awaiter(this, void 0, void 0, function () {
-            var _f;
-            return __generator(this, function (_g) {
-                switch (_g.label) {
+            var size, _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
-                        _f = effect;
-                        switch (_f) {
+                        size = this.manager.getSize();
+                        _a = effect;
+                        switch (_a) {
                             case 'rollIn': return [3 /*break*/, 1];
                             case 'rollOutPauseAndBack': return [3 /*break*/, 3];
                             case 'turn': return [3 /*break*/, 7];
                         }
                         return [3 /*break*/, 9];
                     case 1: return [4 /*yield*/, element.animate([
-                            { transform: "translate(0px, ".concat(-((_a = this.manager.getDieType(die).size) !== null && _a !== void 0 ? _a : 50) * 5, "px)") },
+                            { transform: "translate(0px, ".concat(-size * 5, "px)") },
                             { transform: "translate(0px, 0px)" },
                         ], duration).finished];
                     case 2:
-                        _g.sent();
+                        _b.sent();
                         /*this.manager.animationManager.slideInFromDelta(
                             element,
                             {
                                 x: 0,
-                                y: -(this.manager.getDieType(die).size ?? 50) * 5,
+                                y: -size * 5,
                             }
                         );*/
                         return [3 /*break*/, 9];
                     case 3: return [4 /*yield*/, element.animate([
                             { transform: "translate(0px, 0px)" },
-                            { transform: "translate(0px, ".concat(((_b = this.manager.getDieType(die).size) !== null && _b !== void 0 ? _b : 50) * 5, "px)") },
+                            { transform: "translate(0px, ".concat(size * 5, "px)") },
                         ], duration).finished];
                     case 4:
-                        _g.sent();
+                        _b.sent();
                         return [4 /*yield*/, element.animate([
-                                { transform: "translate(0px, ".concat(((_c = this.manager.getDieType(die).size) !== null && _c !== void 0 ? _c : 50) * 5, "px)") },
-                                { transform: "translate(0px, ".concat(((_d = this.manager.getDieType(die).size) !== null && _d !== void 0 ? _d : 50) * 5, "px)") },
+                                { transform: "translate(0px, ".concat(size * 5, "px)") },
+                                { transform: "translate(0px, ".concat(size * 5, "px)") },
                             ], duration).finished];
                     case 5:
-                        _g.sent();
+                        _b.sent();
                         return [4 /*yield*/, element.animate([
-                                { transform: "translate(0px, ".concat(((_e = this.manager.getDieType(die).size) !== null && _e !== void 0 ? _e : 50) * 5, "px)") },
+                                { transform: "translate(0px, ".concat(size * 5, "px)") },
                                 { transform: "translate(0px, 0px)" },
                             ], duration).finished];
                     case 6:
-                        _g.sent();
+                        _b.sent();
                         return [3 /*break*/, 9];
                     case 7: return [4 /*yield*/, this.manager.game.wait(duration)];
                     case 8:
-                        _g.sent();
+                        _b.sent();
                         return [3 /*break*/, 9];
                     case 9: return [2 /*return*/];
                 }
@@ -758,7 +675,7 @@ var DiceStock = /** @class */ (function () {
         faces.style.setProperty('--roll-duration', "".concat(animate ? duration : 0, "ms"));
         faces.clientWidth;
         faces.style.removeProperty('transform');
-        faces.dataset.visibleFace = "".concat(die.face);
+        faces.dataset.visibleFace = "".concat(this.manager.getDieFace(die));
     };
     return DiceStock;
 }());
@@ -1031,61 +948,95 @@ var DiceManager = /** @class */ (function () {
      * @param settings: a `DieManagerSettings` object
      */
     function DiceManager(game, settings) {
-        var _this = this;
         var _a;
         this.game = game;
         this.settings = settings;
         this.stocks = [];
-        this.registeredDieTypes = [];
         this.animationManager = (_a = settings.animationManager) !== null && _a !== void 0 ? _a : new AnimationManager(game);
-        if (settings.dieTypes) {
-            Object.entries(settings.dieTypes).forEach(function (entry) { return _this.setDieType(entry[0], entry[1]); });
+        if (![4, 6, 8].includes(this.getFaces())) {
+            throw new Error('Unsupported settings.faces');
         }
     }
     DiceManager.prototype.addStock = function (stock) {
         this.stocks.push(stock);
     };
-    DiceManager.prototype.setDieType = function (type, dieType) {
-        this.registeredDieTypes[type] = dieType;
+    DiceManager.prototype.getFaces = function () {
+        var _a;
+        return (_a = this.settings.faces) !== null && _a !== void 0 ? _a : 6;
     };
-    DiceManager.prototype.getDieType = function (die) {
-        return this.registeredDieTypes[die.type];
+    DiceManager.prototype.getSize = function () {
+        var _a;
+        return (_a = this.settings.size) !== null && _a !== void 0 ? _a : 50;
     };
+    DiceManager.prototype.getBorderRadius = function () {
+        var _a;
+        return (_a = this.settings.borderRadius) !== null && _a !== void 0 ? _a : 0;
+    };
+    /**
+     * @param die the die informations
+     * @return the id for a die
+     */
     DiceManager.prototype.getId = function (die) {
-        return "bga-die-".concat(die.type, "-").concat(die.id);
+        var _a, _b, _c;
+        return (_c = (_b = (_a = this.settings).getId) === null || _b === void 0 ? void 0 : _b.call(_a, die)) !== null && _c !== void 0 ? _c : "".concat(die.id);
+    };
+    /**
+     * @param card the card informations
+     * @return the id for a card element
+     */
+    DiceManager.prototype.getDieElementId = function (die) {
+        return "".concat(this.getType(), "-").concat(this.getId(die));
+    };
+    /**
+     *
+     * @returns the type of the dice, either set in the settings or by using game_name if there is only 1 type.
+     */
+    DiceManager.prototype.getType = function () {
+        var _a;
+        return (_a = this.settings.type) !== null && _a !== void 0 ? _a : "".concat(this.game.game_name, "-dice");
+    };
+    /**
+     * Return the die face.
+     * Default: the face will be set to `die.face`.
+     *
+     * @param die the die informations
+     * @return the die face
+     */
+    DiceManager.prototype.getDieFace = function (die) {
+        var _a, _b, _c;
+        return (_c = (_b = (_a = this.settings).getDieFace) === null || _b === void 0 ? void 0 : _b.call(_a, die)) !== null && _c !== void 0 ? _c : die.face;
     };
     DiceManager.prototype.createDieElement = function (die) {
-        var _a, _b, _c;
-        var id = this.getId(die);
+        var _a, _b;
+        var id = this.getDieElementId(die);
         if (this.getDieElement(die)) {
             throw new Error("This die already exists ".concat(JSON.stringify(die)));
         }
-        var dieType = this.registeredDieTypes[die.type];
-        if (!dieType) {
-            throw new Error("This die type doesn't exists ".concat(die.type));
-        }
+        var faces = this.getFaces();
+        var type = this.getType();
         var element = document.createElement("div");
         element.id = id;
-        element.classList.add('bga-dice_die');
-        element.style.setProperty('--size', "".concat((_a = dieType.size) !== null && _a !== void 0 ? _a : 50, "px"));
+        element.classList.add('bga-dice_die', "bga-dice_die".concat(faces), type);
+        element.style.setProperty('--size', "".concat(this.getSize(), "px"));
+        element.style.setProperty('--bga-dice_border-radius', "".concat(this.getBorderRadius(), "%"));
         var dieFaces = document.createElement("div");
         dieFaces.classList.add('bga-dice_die-faces');
-        dieFaces.dataset.visibleFace = '' + die.face;
+        dieFaces.dataset.visibleFace = '' + this.getDieFace(die);
         element.appendChild(dieFaces);
         var facesElements = [];
-        for (var i = 1; i <= dieType.facesCount; i++) {
+        for (var i = 1; i <= faces; i++) {
             facesElements[i] = document.createElement("div");
             facesElements[i].id = "".concat(id, "-face-").concat(i);
-            facesElements[i].classList.add('bga-dice_die-face');
+            facesElements[i].classList.add('bga-dice_die-face', "".concat(type, "-face-").concat(i));
             facesElements[i].dataset.face = '' + i;
             dieFaces.appendChild(facesElements[i]);
             element.dataset.face = '' + i;
         }
         document.body.appendChild(element);
-        (_b = dieType.setupDieDiv) === null || _b === void 0 ? void 0 : _b.call(dieType, die, element);
-        if (dieType.setupFaceDiv) {
-            for (var i = 1; i <= dieType.facesCount; i++) {
-                (_c = dieType.setupFaceDiv) === null || _c === void 0 ? void 0 : _c.call(dieType, die, facesElements[i], i);
+        (_b = (_a = this.settings).setupDieDiv) === null || _b === void 0 ? void 0 : _b.call(_a, die, element);
+        if (this.settings.setupFaceDiv) {
+            for (var i = 1; i <= faces; i++) {
+                this.settings.setupFaceDiv(die, facesElements[i], i);
             }
         }
         document.body.removeChild(element);
@@ -1096,7 +1047,7 @@ var DiceManager = /** @class */ (function () {
      * @return the HTML element of an existing die
      */
     DiceManager.prototype.getDieElement = function (die) {
-        return document.getElementById(this.getId(die));
+        return document.getElementById(this.getDieElementId(die));
     };
     /**
      * Remove a die.
@@ -1105,12 +1056,11 @@ var DiceManager = /** @class */ (function () {
      */
     DiceManager.prototype.removeDie = function (die) {
         var _a;
-        var id = this.getId(die);
-        var div = document.getElementById(id);
+        var div = this.getDieElement(die);
         if (!div) {
             return false;
         }
-        div.id = "deleted".concat(id);
+        div.id = "deleted-".concat(div.id);
         div.remove();
         // if the die is in a stock, notify the stock about removal
         (_a = this.getDieStock(die)) === null || _a === void 0 ? void 0 : _a.dieRemoved(die);
@@ -1133,7 +1083,7 @@ var DiceManager = /** @class */ (function () {
     DiceManager.prototype.updateDieInformations = function (die, updateData) {
         var _this = this;
         var div = this.getDieElement(die);
-        div.dataset.visibleFace = '' + die.face;
+        div.dataset.visibleFace = '' + this.getDieFace(die);
         if (updateData !== null && updateData !== void 0 ? updateData : true) {
             // die data has changed
             var stock = this.getDieStock(die);

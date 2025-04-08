@@ -69,9 +69,9 @@ type DiceRollEffect = 'rollIn' | 'rollInBump' | 'rollOutPauseAndBack' | 'rollOut
 /**
  * The abstract stock. It shouldn't be used directly, use stocks that extends it.
  */
-class DiceStock {
-    protected dice: BgaDie[] = [];
-    protected selectedDice: BgaDie[] = [];
+class DiceStock<T> {
+    protected dice: T[] = [];
+    protected selectedDice: T[] = [];
     protected selectionMode: DiceSelectionMode = 'none';
     protected sort?: SortFunction; 
 
@@ -81,20 +81,20 @@ class DiceStock {
      * selection: the selected dice of the stock  
      * lastChange: the last change on selection die (can be selected or unselected)
      */
-    public onSelectionChange?: (selection: BgaDie[], lastChange: BgaDie | null) => void;
+    public onSelectionChange?: (selection: T[], lastChange: T | null) => void;
 
     /**
      * Called when selection change. Returns the clicked die.
      * 
      * die: the clicked die (can be selected or unselected)
      */
-    public onDieClick?: (die: BgaDie) => void;
+    public onDieClick?: (die: T) => void;
 
     /**
      * @param manager the die manager  
      * @param element the stock element (should be an empty HTML Element)
      */
-    constructor(protected manager: DiceManager, protected element: HTMLElement, private settings?: DieStockSettings) {
+    constructor(protected manager: DiceManager<T>, protected element: HTMLElement, private settings?: DieStockSettings) {
         manager.addStock(this);
         element?.classList.add('bga-dice_die-stock'/*, this.constructor.name.split(/(?=[A-Z])/).join('-').toLowerCase()* doesn't work in production because of minification */);
         const perspective = this.getPerspective();
@@ -107,7 +107,7 @@ class DiceStock {
     /**
      * @returns the dice on the stock
      */
-    public getDice(): BgaDie[] {
+    public getDice(): T[] {
         return this.dice.slice();
     }
 
@@ -121,14 +121,14 @@ class DiceStock {
     /**
      * @returns the selected dice
      */
-    public getSelection(): BgaDie[] {
+    public getSelection(): T[] {
         return this.selectedDice.slice();
     }
 
     /**
      * @returns the selected dice
      */
-    public isSelected(die: BgaDie): boolean {
+    public isSelected(die: T): boolean {
         return this.selectedDice.some(c => this.manager.getId(c) == this.manager.getId(die));
     }
 
@@ -136,7 +136,7 @@ class DiceStock {
      * @param die a die  
      * @returns if the die is present in the stock
      */
-    public contains(die: BgaDie): boolean {
+    public contains(die: T): boolean {
         return this.dice.some(c => this.manager.getId(c) == this.manager.getId(die));
     }
 
@@ -144,7 +144,7 @@ class DiceStock {
      * @param die a die in the stock
      * @returns the HTML element generated for the die
      */
-    public getDieElement(die: BgaDie): HTMLElement {
+    public getDieElement(die: T): HTMLElement {
         return this.manager.getDieElement(die);
     }
 
@@ -155,7 +155,7 @@ class DiceStock {
      * @param settings the addDie settings
      * @returns if the die can be added
      */
-    protected canAddDie(die: BgaDie, settings?: AddDieSettings) {
+    protected canAddDie(die: T, settings?: AddDieSettings) {
         return !this.contains(die);
     }
 
@@ -167,7 +167,7 @@ class DiceStock {
      * @param settings a `AddDiceettings` object
      * @returns the promise when the animation is done (true if it was animated, false if it wasn't)
      */
-    public addDie(die: BgaDie, animation?: DieAnimation, settings?: AddDieSettings): Promise<boolean> {
+    public addDie(die: T, animation?: DieAnimation, settings?: AddDieSettings): Promise<boolean> {
         if (!this.canAddDie(die, settings)) {
             return Promise.resolve(false);
         }
@@ -219,7 +219,7 @@ class DiceStock {
         return promise;
     }
 
-    protected getNewDieIndex(die: BgaDie): number | undefined {
+    protected getNewDieIndex(die: T): number | undefined {
         if (this.sort) {
             const otherDice = this.getDice();
             for (let i = 0; i<otherDice.length; i++) {
@@ -245,7 +245,7 @@ class DiceStock {
         }
     }
 
-    protected moveFromOtherStock(die: BgaDie, dieElement: HTMLElement, animation: DieAnimation, settings?: AddDieSettings): Promise<boolean> {
+    protected moveFromOtherStock(die: T, dieElement: HTMLElement, animation: DieAnimation, settings?: AddDieSettings): Promise<boolean> {
         let promise: Promise<boolean>;
 
         const element = animation.fromStock.contains(die) ? this.manager.getDieElement(die) : animation.fromStock.element;
@@ -271,7 +271,7 @@ class DiceStock {
         return promise;
     }
 
-    protected moveFromElement(die: BgaDie, dieElement: HTMLElement, animation: DieAnimation, settings?: AddDieSettings): Promise<boolean> {
+    protected moveFromElement(die: T, dieElement: HTMLElement, animation: DieAnimation, settings?: AddDieSettings): Promise<boolean> {
         let promise: Promise<boolean>;
 
         this.addDieElementToParent(dieElement, settings);
@@ -309,7 +309,7 @@ class DiceStock {
      * @param settings a `AddDiceettings` object
      * @param shift if number, the number of milliseconds between each die. if true, chain animations
      */
-    public async addDice(dice: BgaDie[], animation?: DieAnimation, settings?: AddDieSettings, shift: number | boolean = false): Promise<boolean> {
+    public async addDice(dice: T[], animation?: DieAnimation, settings?: AddDieSettings, shift: number | boolean = false): Promise<boolean> {
         if (!this.manager.game.bgaAnimationsActive()) {
             shift = false;
         }
@@ -338,7 +338,7 @@ class DiceStock {
      * 
      * @param die die die to remove
      */
-    public removeDie(die: BgaDie) {
+    public removeDie(die: T) {
         if (this.contains(die) && this.element.contains(this.getDieElement(die))) {
             this.manager.removeDie(die);
         }
@@ -350,7 +350,7 @@ class DiceStock {
      * 
      * @param die the die to remove
      */
-    public dieRemoved(die: BgaDie) {
+    public dieRemoved(die: T) {
         const index = this.dice.findIndex(c => this.manager.getId(c) == this.manager.getId(die));
         if (index !== -1) {
             this.dice.splice(index, 1);
@@ -365,7 +365,7 @@ class DiceStock {
      * 
      * @param dice the dice to remove
      */
-    public removeDice(dice: BgaDie[]) {
+    public removeDice(dice: T[]) {
         dice.forEach(die => this.removeDie(die));
     }
 
@@ -384,7 +384,7 @@ class DiceStock {
      * @param selectionMode the selection mode
      * @param selectableDice the selectable dice (all if unset). Calls `setSelectableDice` method
      */
-    public setSelectionMode(selectionMode: DiceSelectionMode, selectableDice?: BgaDie[]) {
+    public setSelectionMode(selectionMode: DiceSelectionMode, selectableDice?: T[]) {
         if (selectionMode !== this.selectionMode) {
             this.unselectAll(true);
         }
@@ -400,7 +400,7 @@ class DiceStock {
         }
     }
 
-    protected setSelectableDie(die: BgaDie, selectable: boolean) {
+    protected setSelectableDie(die: T, selectable: boolean) {
         if (this.selectionMode === 'none') {
             return;
         }
@@ -426,7 +426,7 @@ class DiceStock {
      * 
      * @param selectableDice the selectable dice. If unset, all dice are marked selectable. Default unset.
      */
-    public setSelectableDice(selectableDice?: BgaDie[]) {
+    public setSelectableDice(selectableDice?: T[]) {
         if (this.selectionMode === 'none') {
             return;
         }
@@ -443,7 +443,7 @@ class DiceStock {
      * 
      * @param die the die to select
      */
-    public selectDie(die: BgaDie, silent: boolean = false) {
+    public selectDie(die: T, silent: boolean = false) {
         if (this.selectionMode == 'none') {
             return;
         }
@@ -473,7 +473,7 @@ class DiceStock {
      * 
      * @param die the die to unselect
      */
-    public unselectDie(die: BgaDie, silent: boolean = false) {
+    public unselectDie(die: T, silent: boolean = false) {
         const element = this.getDieElement(die);      
         const selectedDiceClass = this.getSelectedDieClass();
         element.classList.remove(selectedDiceClass);
@@ -521,7 +521,7 @@ class DiceStock {
             if (!dieDiv) {
                 return;
             }
-            const die = this.dice.find(c => this.manager.getId(c) == dieDiv.id);
+            const die = this.dice.find(c => this.manager.getDieElementId(c) == dieDiv.id);
             if (!die) {
                 return;
             }
@@ -529,7 +529,7 @@ class DiceStock {
         });
     }
 
-    protected dieClick(die: BgaDie) {
+    protected dieClick(die: T) {
         if (this.selectionMode != 'none') {
             const alreadySelected = this.selectedDice.some(c => this.manager.getId(c) == this.manager.getId(die));
 
@@ -591,7 +591,7 @@ class DiceStock {
         return this.settings?.selectedDieClass === undefined ? this.manager.getSelectedDieClass() : this.settings?.selectedDieClass;
     }
 
-    public removeSelectionClasses(die: BgaDie) {        
+    public removeSelectionClasses(die: T) {        
         this.removeSelectionClassesFromElement(this.getDieElement(die));
     }
 
@@ -603,32 +603,33 @@ class DiceStock {
         dieElement.classList.remove(selectableDiceClass, unselectableDiceClass, selectedDiceClass);
     }
 
-    protected async addRollEffectToDieElement(die: BgaDie, element: HTMLElement, effect: DiceRollEffect, duration: number) {
+    protected async addRollEffectToDieElement(die: T, element: HTMLElement, effect: DiceRollEffect, duration: number) {
+        const size = this.manager.getSize();
         switch (effect) {
             case 'rollIn':
                 await element.animate([
-                    { transform: `translate(0px, ${-(this.manager.getDieType(die).size ?? 50) * 5}px)`},
+                    { transform: `translate(0px, ${-size * 5}px)`},
                     { transform: `translate(0px, 0px)` },
                 ], duration).finished;
                 /*this.manager.animationManager.slideInFromDelta(
                     element,
                     {
                         x: 0,
-                        y: -(this.manager.getDieType(die).size ?? 50) * 5,
+                        y: -size * 5,
                     }
                 );*/
                 break;
             case 'rollOutPauseAndBack':
                 await element.animate([
                     { transform: `translate(0px, 0px)` },
-                    { transform: `translate(0px, ${(this.manager.getDieType(die).size ?? 50) * 5}px)`},
+                    { transform: `translate(0px, ${size * 5}px)`},
                 ], duration).finished;
                 await element.animate([
-                    { transform: `translate(0px, ${(this.manager.getDieType(die).size ?? 50) * 5}px)`},
-                    { transform: `translate(0px, ${(this.manager.getDieType(die).size ?? 50) * 5}px)`},
+                    { transform: `translate(0px, ${size * 5}px)`},
+                    { transform: `translate(0px, ${size * 5}px)`},
                 ], duration).finished;
                 await element.animate([
-                    { transform: `translate(0px, ${(this.manager.getDieType(die).size ?? 50) * 5}px)`},
+                    { transform: `translate(0px, ${size * 5}px)`},
                     { transform: `translate(0px, 0px)` },
                 ], duration).finished;
                 break;
@@ -638,11 +639,11 @@ class DiceStock {
         }
     }
 
-    public rollDice(dice: BgaDie[], settings?: RollDieSettings) {
+    public rollDice(dice: T[], settings?: RollDieSettings) {
         dice.forEach(die => this.rollDie(die, settings));
     }
 
-    public rollDie(die: BgaDie, settings?: RollDieSettings) {
+    public rollDie(die: T, settings?: RollDieSettings) {
         const div = this.getDieElement(die);
         const faces = div.querySelector('.bga-dice_die-faces') as HTMLElement;
 
@@ -671,6 +672,6 @@ class DiceStock {
         faces.style.setProperty('--roll-duration', `${animate ? duration : 0}ms`);
         faces.clientWidth;
         faces.style.removeProperty('transform');
-        faces.dataset.visibleFace = `${die.face}`;
+        faces.dataset.visibleFace = `${this.manager.getDieFace(die)}`;
     }
 }
