@@ -29,7 +29,7 @@ class VoidDiceStock<T> extends DiceStock<T> {
      * @param settings a `AddDieToVoidStockSettings` object
      * @returns the promise when the animation is done (true if it was animated, false if it wasn't)
      */
-    public addDie(die: T, animation?: DieAnimation, settings?: AddDieToVoidStockSettings): Promise<boolean> {
+    public addDie(die: T, animation?: DieAnimationSettings, settings?: AddDieToVoidStockSettings): Promise<boolean> {
         let promise = super.addDie(die, animation, settings);
 
         // center the element

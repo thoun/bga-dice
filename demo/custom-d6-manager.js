@@ -1,7 +1,8 @@
 let customD6Manager;
 
 function initCustomD6Manager() {
-    customD6Manager = new DiceManager(game, {
+    customD6Manager = new DiceManager({
+        animationManager: animationManager,
         setupDieDiv(die, element) {
             element.classList.add('takenokolor-die');
             element.style.setProperty('--color', die.color);

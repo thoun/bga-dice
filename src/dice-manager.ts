@@ -59,9 +59,9 @@ interface DiceManagerSettings<T> {
     getDieFace?: (die: T) => number;
 
     /**
-     * The animation manager used in the game. If not provided, a new one will be instanciated for this die manager. Useful if you use AnimationManager outside of dice manager, to avoid double instanciation.
+     * The animation manager used in the game.
      */
-    animationManager?: AnimationManager;
+    animationManager: AnimationManager;
 
     /**
      * Perspective effect on Stock elements. Default 1000px. Can be overriden on each stock.
@@ -90,11 +90,14 @@ class DiceManager<T> {
     private stocks: DiceStock<T>[] = [];
 
     /**
-     * @param game the BGA game class, usually it will be `this`
      * @param settings: a `DieManagerSettings` object
      */
-    constructor(public game: Game, private settings: DiceManagerSettings<T>) {
-        this.animationManager = settings.animationManager ?? new AnimationManager(game);
+    constructor(private settings: DiceManagerSettings<T>) {
+        if (!settings || !settings.animationManager) {
+            throw new Error('You must define an AnimationManager in the settings');
+        }
+
+        this.animationManager = settings.animationManager;
 
         if (![4, 6, 8].includes(this.getFaces())) {
             throw new Error('Unsupported settings.faces');
@@ -135,10 +138,10 @@ class DiceManager<T> {
 
     /**
      * 
-     * @returns the type of the dice, either set in the settings or by using game_name if there is only 1 type.
+     * @returns the type of the dice, either set in the settings or by using a default name if there is only 1 type.
      */
     public getType(): string {
-        return this.settings.type ?? `${(this.game as any).game_name}-dice`;
+        return this.settings.type ?? `game-dice`;
     }
 
     /** 

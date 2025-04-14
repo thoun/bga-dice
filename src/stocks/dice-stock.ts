@@ -290,7 +290,7 @@ class DiceStock<T> {
      * @param shift if number, the number of milliseconds between each die. if true, chain animations
      */
     public async addDice(dice: T[], animation?: DieAnimationSettings, settings?: AddDieSettings, shift: number | boolean = false): Promise<boolean> {
-        if (!this.manager.game.bgaAnimationsActive()) {
+        if (!this.manager.animationManager.animationsActive()) {
             shift = false;
         }
         let promises: Promise<boolean>[] = [];
@@ -589,18 +589,19 @@ class DiceStock<T> {
                 break;
             case 'rollOutPauseAndBack':
                 const angle = this.getRand(-45, 45);
-                await this.getRollAnimation(element, duration, 0, size * 5, true, angle);
+                const distance = this.getRand(size * 4, size * 6);
+                await this.getRollAnimation(element, duration, 0, distance, true, angle);
                 await element.animate([
-                    { transform: `translate(0px, ${size * 5}px) rotate(${angle}deg)` },
-                    { transform: `translate(0px, ${size * 5}px) rotate(${angle}deg)` },
+                    { transform: `translate(0px, ${distance}px) rotate(${angle}deg)` },
+                    { transform: `translate(0px, ${distance}px) rotate(${angle}deg)` },
                 ], duration / 3).finished;
                 await element.animate([
-                    { transform: `translate(0px, ${size * 5}px) rotate(${angle}deg)` },
+                    { transform: `translate(0px, ${distance}px) rotate(${angle}deg)` },
                     { transform: `translate(0px, 0px)` },
                 ], duration / 3).finished;
                 break;
             case 'turn':
-                await this.manager.game.wait(duration);
+                await this.manager.animationManager.base.wait(duration);
                 break;
         }
     }
@@ -616,7 +617,7 @@ class DiceStock<T> {
         faces.dataset.visibleFace = `${this.manager.getDieFace(die)}`;
 
         const rollEffect = settings?.effect ?? 'rollIn';
-        const animate = this.manager.game.bgaAnimationsActive() && rollEffect !== 'none';
+        const animate = this.manager.animationManager.animationsActive() && rollEffect !== 'none';
         if (animate) {
             let duration = settings?.duration ?? 1000;
             if (Array.isArray(duration)) {
