@@ -1,7 +1,7 @@
 let d8Manager;
 
 function initD8Manager() {
-    d8Manager = new DiceManager({
+    d8Manager = new BgaDice.Manager({
         animationManager: animationManager,
         type: 'blue-d8',
         faces: 8,

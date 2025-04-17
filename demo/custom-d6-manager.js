@@ -1,7 +1,7 @@
 let customD6Manager;
 
 function initCustomD6Manager() {
-    customD6Manager = new DiceManager({
+    customD6Manager = new BgaDice.Manager({
         animationManager: animationManager,
         setupDieDiv(die, element) {
             element.classList.add('takenokolor-die');

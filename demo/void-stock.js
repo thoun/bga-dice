@@ -1,7 +1,7 @@
 let voidStock;
 
 function initVoidStock() {
-    voidStock = new VoidDiceStock(d6Manager, document.getElementById('void-stock'));
+    voidStock = new BgaDice.VoidStock(d6Manager, document.getElementById('void-stock'));
 }
 
 function addDieToVoidStock(fromElement) {

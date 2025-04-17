@@ -19,7 +19,7 @@ loadBgaGameLib('bga-dice', '0.x');
 
     constructor: function() {
         // create the dice manager
-        this.cardManager = new DiceManager(...);
+        this.diceManager = new BgaDice.Manager(...);
 
         // ...
     },

@@ -13,7 +13,7 @@ function manualPositionDiagonalUpdateDisplay(element, dice, lastDie, stock) {
 }
 
 function initManualPositionDiagonalStock() {
-    manualPositionDiagonalStock = new ManualPositionDiceStock(d6Manager, document.getElementById('manual-position-diagonal-stock'), undefined, manualPositionDiagonalUpdateDisplay);
+    manualPositionDiagonalStock = new BgaDice.ManualPositionStock(d6Manager, document.getElementById('manual-position-diagonal-stock'), undefined, manualPositionDiagonalUpdateDisplay);
 
     // add dice
     manualPositionDiagonalStock.addDice([
@@ -80,7 +80,7 @@ function initManualPositionCurveStock() {
     }
     ctx.stroke();
 
-    manualPositionCurveStock = new ManualPositionDiceStock(d6Manager, document.getElementById('manual-position-curve-stock'), undefined, manualPositionCurveUpdateDisplay);
+    manualPositionCurveStock = new BgaDice.ManualPositionStock(d6Manager, document.getElementById('manual-position-curve-stock'), undefined, manualPositionCurveUpdateDisplay);
 
     // add dice
     manualPositionCurveStock.addDice([

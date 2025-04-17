@@ -14,19 +14,19 @@ function (dojo, declare, debounce, gamegui, /*...,*/ bgaDice) {
       constructor: function() {
 
         // create the animation manager, used by the dice manager
-        this.animationManager = new AnimationManager({
+        this.animationManager = new BgaAnimations.Manager({
             animationsActive: () => this.bgaAnimationsActive(),
         });
 
         // create the dice manager
-        this.diceManager = new DiceManager({
+        this.diceManager = new BgaDice.Manager({
             animationManager: this.animationManager,
             type: 'colored-die',
             borderRadius: 12,
         });
 
         // create the stock
-        this.stock = new LineDiceStock(this.diceManager, document.getElementById('dice-stock'));
+        this.stock = new BgaDice.LineStock(this.diceManager, document.getElementById('dice-stock'));
 
         this.stock.addDice([
             { id: getDieId(), type: 'white', face: 2, location: 'table', location_arg: 0 },

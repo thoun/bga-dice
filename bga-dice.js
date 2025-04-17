@@ -938,3 +938,11 @@ class DiceManager {
         return ((_a = this.settings) === null || _a === void 0 ? void 0 : _a.selectedDieClass) === undefined ? 'bga-dice_selected-die' : (_b = this.settings) === null || _b === void 0 ? void 0 : _b.selectedDieClass;
     }
 }
+const BgaDice = {
+    Manager: DiceManager,
+    Stock: DiceStock,
+    LineStock: LineDiceStock,
+    ManualPositionStock: ManualPositionDiceStock,
+    SlotStock: SlotDiceStock,
+    VoidStock: VoidDiceStock,
+};

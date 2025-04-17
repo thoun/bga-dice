@@ -19,6 +19,7 @@
       "src/stocks/slot-stock.ts",
       "src/stocks/manual-position-stock.ts",
       "src/stocks/void-stock.ts",
-      "src/dice-manager.ts"
+      "src/dice-manager.ts",
+      "src/index.ts"
     ]
 }

@@ -1,7 +1,7 @@
 let customD6LineStock;
 
 function initCustomD6LineStock() {
-    customD6LineStock = new LineDiceStock(customD6Manager, document.getElementById('line-stock'), {
+    customD6LineStock = new BgaDice.LineStock(customD6Manager, document.getElementById('line-stock'), {
         sort: sortFunction('type', 'type_arg'),
         direction: 'column',
         center: true,

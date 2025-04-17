@@ -1,7 +1,7 @@
 let d6Manager;
 
 function initD6Manager() {
-    d6Manager = new DiceManager({
+    d6Manager = new BgaDice.Manager({
         animationManager: animationManager,
         type: 'colored-die',
         borderRadius: 12,

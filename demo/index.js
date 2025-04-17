@@ -3,7 +3,7 @@ let d4LineStock;
 let d8LineStock;
 
 function initD6LineStock() {
-    d6LineStock = new LineDiceStock(d6Manager, document.getElementById('line-stock'));
+    d6LineStock = new BgaDice.LineStock(d6Manager, document.getElementById('line-stock'));
 
     // add dice
     d6LineStock.addDice([
@@ -17,7 +17,7 @@ function initD6LineStock() {
 }
 
 function initD4LineStock() {
-    d4LineStock = new LineDiceStock(d4Manager, document.getElementById('d4-line-stock'));
+    d4LineStock = new BgaDice.LineStock(d4Manager, document.getElementById('d4-line-stock'));
 
     // add dice
     d4LineStock.addDice([
@@ -26,7 +26,7 @@ function initD4LineStock() {
 }
 
 function initD8LineStock() {
-    d8LineStock = new LineDiceStock(d8Manager, document.getElementById('d8-line-stock'));
+    d8LineStock = new BgaDice.LineStock(d8Manager, document.getElementById('d8-line-stock'));
 
     // add dice
     d8LineStock.addDice([
