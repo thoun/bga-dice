@@ -13,7 +13,7 @@ let game = {
     },
 };
 
-function initCommon() {
+function initCommon(BgaAnimations) {
     animationManager = new BgaAnimations.Manager({
         animationsActive: () => game.bgaAnimationsActive(),
     });

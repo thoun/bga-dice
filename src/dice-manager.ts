@@ -1,4 +1,8 @@
-interface DiceManagerSettings<T> {
+import { DiceStock } from "./stocks/dice-stock";
+
+type AnimationManager = any;
+
+export interface DiceManagerSettings<T> {
     /**
      * The type of dice, if you game has multiple dice types (each dice manager should have a different type).
      * Default `${yourgamename}-dice`.
@@ -84,7 +88,7 @@ interface DiceManagerSettings<T> {
     selectedDieClass?: string | null;
 }
 
-class DiceManager<T> {
+export class DiceManager<T> {
     public animationManager: AnimationManager;
 
     private stocks: DiceStock<T>[] = [];

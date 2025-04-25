@@ -7,11 +7,13 @@ define([
    "dojo/debounce",
    "ebg/core/gamegui",
    /*...,*/
-   g_gamethemeurl + "modules/bga-dice.js",
+   getLibUrl('bga-animations', '0.0.x'),
+   getLibUrl('bga-dice', '0.0.x'),
 ],
-function (dojo, declare, debounce, gamegui, /*...,*/ bgaDice) {
+function (dojo, declare, debounce, gamegui, /*...,*/, BgaAnimations, BgaDice) {
+    // make sure the BgaAnimations variable match the above array index, if `getLibUrl('bga-animations', '0.0.x')` is at the 6th position of the array, BgaAnimations should be the 6th param
    return declare("bgagame.mygame", gamegui, {
-      constructor: function() {
+      setup: function() {
 
         // create the animation manager, used by the dice manager
         this.animationManager = new BgaAnimations.Manager({

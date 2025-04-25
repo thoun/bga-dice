@@ -1,3 +1,7 @@
+import { DieAnimationSettings } from "../animations";
+import { DiceManager } from "../dice-manager";
+import { AddDieSettings, DiceStock } from "./dice-stock";
+
 interface AddDieToVoidStockSettings extends AddDieSettings {
     /**
      * Removes the die after adding.
@@ -10,7 +14,7 @@ interface AddDieToVoidStockSettings extends AddDieSettings {
 /**
  * A stock to make dice disappear (to automatically remove disdieed dice, or to represent a bag)
  */
-class VoidDiceStock<T> extends DiceStock<T> {
+export class VoidStock<T> extends DiceStock<T> {
 
     /**
      * @param manager the die manager  
@@ -25,7 +29,7 @@ class VoidDiceStock<T> extends DiceStock<T> {
      * Add a die to the stock.
      *
      * @param die the die to add  
-     * @param animation a `DieAnimation` object
+     * @param animation a `DieAnimationSettings` object
      * @param settings a `AddDieToVoidStockSettings` object
      * @returns the promise when the animation is done (true if it was animated, false if it wasn't)
      */

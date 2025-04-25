@@ -1,10 +1,14 @@
-interface DieStockSettings {
+import { DieAnimationSettings } from "../animations";
+import { DiceManager } from "../dice-manager";
+import { SortFunction } from "../sort";
+
+export interface DieStockSettings<T> {
     /**
      * Indicate the die sorting (unset means no sorting, new dice will be added at the end).
      * For example, use `sort: sortFunction('type', '-type_arg')` to sort by type then type_arg (in reversed order if prefixed with `-`). 
      * Be sure you typed the values correctly! Else '11' will be before '2'.
      */
-    sort?: SortFunction;
+    sort?: SortFunction<T>;
 
     /**
      * Perspective effect on Stock elements. Default 1000px. Can be overriden on each stock.
@@ -27,7 +31,7 @@ interface DieStockSettings {
     selectedDieClass?: string | null;
 }
 
-interface AddDieSettings {
+export interface AddDieSettings {
     forceToElement?: HTMLElement;
 
     /**
@@ -45,7 +49,7 @@ interface AddDieSettings {
      */
     fadeIn?: boolean;
 }
-interface RollDieSettings {    
+export interface RollDieSettings {    
     /**
      * Set the dice roll effect. Default 'rollIn';
      */
@@ -58,17 +62,17 @@ interface RollDieSettings {
     duration: number | number[];
 }
 
-type DiceSelectionMode = 'none' | 'single' | 'multiple';
-type DiceRollEffect = 'rollIn' | 'rollInBump' | 'rollOutPauseAndBack' | 'rollOutBumpPauseAndBack' | 'turn' | 'none';
+export type DiceSelectionMode = 'none' | 'single' | 'multiple';
+export type DiceRollEffect = 'rollIn' | 'rollInBump' | 'rollOutPauseAndBack' | 'rollOutBumpPauseAndBack' | 'turn' | 'none';
 
 /**
  * The abstract stock. It shouldn't be used directly, use stocks that extends it.
  */
-class DiceStock<T> {
+export class DiceStock<T> {
     protected dice: T[] = [];
     protected selectedDice: T[] = [];
     protected selectionMode: DiceSelectionMode = 'none';
-    protected sort?: SortFunction; 
+    protected sort?: SortFunction<T>; 
 
     /**
      * Called when selection change. Returns the selection.
@@ -89,7 +93,7 @@ class DiceStock<T> {
      * @param manager the die manager  
      * @param element the stock element (should be an empty HTML Element)
      */
-    constructor(protected manager: DiceManager<T>, protected element: HTMLElement, private settings?: DieStockSettings) {
+    constructor(protected manager: DiceManager<T>, protected element: HTMLElement, private settings?: DieStockSettings<T>) {
         manager.addStock(this);
         element?.classList.add('bga-dice_die-stock'/*, this.constructor.name.split(/(?=[A-Z])/).join('-').toLowerCase()* doesn't work in production because of minification */);
         const perspective = this.getPerspective();
@@ -285,7 +289,7 @@ class DiceStock<T> {
      * Add an array of dice to the stock.
      * 
      * @param dice the dice to add
-     * @param animation a `DieAnimation` object
+     * @param animation a `DieAnimationSettings` object
      * @param settings a `AddDiceettings` object
      * @param shift if number, the number of milliseconds between each die. if true, chain animations
      */

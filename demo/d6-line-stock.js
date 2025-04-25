@@ -1,8 +1,8 @@
 let d6LineStock;
 
-function initD6LineStock(selectable = false) {
+function initD6LineStock(BgaDice, selectable = false) {
     d6LineStock = new BgaDice.LineStock(d6Manager, document.getElementById('line-stock'), {
-        sort: sortFunction('type', 'type_arg')
+        sort: BgaDice.sort('face', 'type')
     });
     d6LineStock.setSelectionMode(selectable ? 'multiple' : 'none');
     d6LineStock.onSelectionChange = (selection, lastChange) => {

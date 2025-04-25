@@ -1,6 +1,6 @@
-type SortFunction = (a, b) => number;
+export type SortFunction<T> = (a: T, b: T) => number;
 
-function sortFunction(...sortedFields: string[]): SortFunction {
+export function sort<T>(...sortedFields: string[]): SortFunction<T> {
     return (a, b) => {
         for (let i = 0; i < sortedFields.length; i++) {
             let direction = 1;
@@ -15,10 +15,10 @@ function sortFunction(...sortedFields: string[]): SortFunction {
             if (type === 'string') {
                 const compare = a[field].localeCompare(b[field]);
                 if (compare !== 0) {
-                    return compare;
+                    return compare * direction;
                 }
             } else if (type === 'number') {
-                const compare = (a[field] - b[field]) * direction;
+                const compare = (a[field] - b[field]);
                 if (compare !== 0) {
                     return compare * direction;
                 }

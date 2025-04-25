@@ -1,6 +1,6 @@
 let customD6Manager;
 
-function initCustomD6Manager() {
+function initCustomD6Manager(BgaDice) {
     customD6Manager = new BgaDice.Manager({
         animationManager: animationManager,
         setupDieDiv(die, element) {

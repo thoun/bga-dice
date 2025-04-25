@@ -1,25 +1,10 @@
 {
-    "rootDir": ".", 
-    "compilerOptions": {
-      "target": "es6",
-      "module": "none",
-      "lib": ["dom", "esnext"],  
-      "sourceMap": false,
-      "outFile": "bga-dice.js",
-      "declaration": true,
-    },
-    "files": [
-      "node_modules/bga-animations/src/animation.d.ts",
-      "node_modules/bga-animations/bga-animations.d.ts",
-      "src/animations.ts",
-      "src/sort.ts",
-      "src/die.ts",
-      "src/stocks/dice-stock.ts",
-      "src/stocks/line-stock.ts",
-      "src/stocks/slot-stock.ts",
-      "src/stocks/manual-position-stock.ts",
-      "src/stocks/void-stock.ts",
-      "src/dice-manager.ts",
-      "src/index.ts"
-    ]
+  "tsconfig": false,
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "lib": ["dom", "esnext"], 
+    "target": "es6",
+    "sourceMap": false
+  }
 }

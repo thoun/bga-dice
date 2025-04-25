@@ -1,6 +1,6 @@
 let voidStock;
 
-function initVoidStock() {
+function initVoidStock(BgaDice) {
     voidStock = new BgaDice.VoidStock(d6Manager, document.getElementById('void-stock'));
 }
 

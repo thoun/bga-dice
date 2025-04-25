@@ -4,20 +4,22 @@
   "description": "",
   "main": "bga-dice.js",
   "scripts": {
-    "build:ts": "tsc",
-    "build:scss": "sass --no-source-map src/bga-dice.scss bga-dice.css",
-    "doc": "typedoc --out docs --readme none ./src/**.ts ./src/dice/**.ts ./src/stocks/**.ts"
+    "build": "rollup -c",
+    "watch": "rollup -c -w",
+    "doc": "typedoc --out docs --readme none ./src/**.ts"
   },
   "author": "",
   "license": "ISC",
-  "peerDependencies": {
-    "bga-animations": "*"
-  },
   "devDependencies": {
     "@microsoft/tsdoc": "0.14.2",
-    "bga-animations": "thoun/bga-animations#1.1.0",
-    "sass": "^1.62.1",
-    "typedoc": "^0.24.7",
-    "typescript": "^5.0.4"
+    "@rollup/plugin-typescript": "^12.1.2",
+    "rollup-plugin-dts": "^6.2.1",
+    "rollup-plugin-flat-dts": "^2.9.0",
+    "rollup": "^4.40.0",
+    "rollup-plugin-postcss": "^4.0.2",
+    "sass": "^1.87.0",
+    "tslib": "^2.8.1",
+    "typedoc": "^0.28.3",
+    "typescript": "^5.8.3"
   }
 }

@@ -2,7 +2,7 @@ let slotStock;
 let slotStockDie1;
 let slotStockDie2;
 
-function initSlotStock() {
+function initSlotStock(BgaDice) {
     slotStock = new BgaDice.SlotStock(d6Manager, document.getElementById('slot-stock'), {
         slotsIds: ['A', 'B', 'C'],
         slotClasses: ['mygame-slot'],

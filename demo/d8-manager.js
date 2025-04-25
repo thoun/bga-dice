@@ -1,6 +1,6 @@
 let d8Manager;
 
-function initD8Manager() {
+function initD8Manager(BgaDice) {
     d8Manager = new BgaDice.Manager({
         animationManager: animationManager,
         type: 'blue-d8',

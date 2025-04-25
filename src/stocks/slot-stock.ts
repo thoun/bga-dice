@@ -1,4 +1,9 @@
-interface SlotStockSettings<T> extends LineStockSettings {
+import { DieAnimationSettings } from "../animations";
+import { DiceManager } from "../dice-manager";
+import { AddDieSettings } from "./dice-stock";
+import { LineStockSettings, LineStock } from "./line-stock";
+
+interface SlotStockSettings<T> extends LineStockSettings<T> {
     /**
      * The ids for the slots (can be number or string)
      */
@@ -27,7 +32,7 @@ interface AddDieToSlotSettings extends AddDieSettings {
 /**
  * A stock with fixed slots (some can be empty)
  */
-class SlotDiceStock<T> extends LineDiceStock<T> {
+export class SlotStock<T> extends LineStock<T> {
     protected slotsIds: SlotId[] = [];
     protected slots: HTMLDivElement[] = [];
     protected slotClasses: string[];
@@ -61,11 +66,11 @@ class SlotDiceStock<T> extends LineDiceStock<T> {
      * Add a die to the stock.
      *
      * @param die the die to add  
-     * @param animation a `DieAnimation` object
+     * @param animation a `DieAnimationSettings` object
      * @param settings a `AddDieToSlotSettings` object
      * @returns the promise when the animation is done (true if it was animated, false if it wasn't)
      */
-    public addDie(die: T, animation?: DieAnimation, settings?: AddDieToSlotSettings): Promise<boolean> {
+    public addDie(die: T, animation?: DieAnimationSettings, settings?: AddDieToSlotSettings): Promise<boolean> {
         const slotId = settings?.slot ?? this.mapDieToSlot?.(die);
         if (slotId === undefined) {
             throw new Error(`Impossible to add die to slot : no SlotId. Add slotId to settings or set mapDieToSlot to SlotDie constructor.`);

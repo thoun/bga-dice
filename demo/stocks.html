@@ -1,13 +1,7 @@
 <html>
     <head>
         <title>bga-dice demo</title>
-        <link href="../node_modules/bga-animations/bga-animations.css" rel="stylesheet"></link>
-        <script src="../node_modules/bga-animations/bga-animations.js" type="text/javascript"></script>
-        <script>
-            function define() {}
-        </script>
-        <link href="../bga-dice.css" rel="stylesheet"></script>
-        <script src="../bga-dice.js" type="text/javascript"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.7/require.min.js" type="text/javascript"></script>
         <link href="./demo.css" rel="stylesheet"></script>
         <script src="./common.js" type="text/javascript"></script>
         <script src="./d6-manager.js" type="text/javascript"></script>
@@ -57,13 +51,19 @@
         </div>
 
         <script>
-            initCommon();
-            initD6Manager();
-            initD6LineStock();
-            initSlotStock();
-            initManualPositionDiagonalStock();
-            initManualPositionCurveStock();
-            initVoidStock();
+            // requirejs is close to dojo loading
+            requirejs([
+                "https://x.boardgamearena.net/data/game-libs/bga-animations/0.0.1/bga-animations.umd.js",
+                window.location.hostname ? "../bga-dice.umd.js" : "../dist/bga-dice.umd.js"
+            ], (BgaAnimations, BgaDice) => {
+                initCommon(BgaAnimations);
+                initD6Manager(BgaDice);
+                initD6LineStock(BgaDice);
+                initSlotStock(BgaDice);
+                initManualPositionDiagonalStock(BgaDice);
+                initManualPositionCurveStock(BgaDice);
+                initVoidStock(BgaDice);
+            });
         </script>
     </body>
 </html>

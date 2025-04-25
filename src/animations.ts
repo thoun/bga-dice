@@ -1,4 +1,8 @@
-interface DieAnimationSettings extends SlideAnimationSettings {
+import { DiceStock } from "./stocks/dice-stock";
+
+declare type SlideAnimationSettings = any;
+
+export interface DieAnimationSettings extends SlideAnimationSettings {
     /**
      * The stock to take the die. It will automatically remove the die from the other stock.
      */

@@ -12,7 +12,7 @@ function manualPositionDiagonalUpdateDisplay(element, dice, lastDie, stock) {
     element.style.height = `${ 150 + 10 * (dice.length - 1) }px`;
 }
 
-function initManualPositionDiagonalStock() {
+function initManualPositionDiagonalStock(BgaDice) {
     manualPositionDiagonalStock = new BgaDice.ManualPositionStock(d6Manager, document.getElementById('manual-position-diagonal-stock'), undefined, manualPositionDiagonalUpdateDisplay);
 
     // add dice
@@ -56,7 +56,7 @@ function manualPositionCurveUpdateDisplay(element, dice, lastDie, stock) {
     });
 }
 
-function initManualPositionCurveStock() {
+function initManualPositionCurveStock(BgaDice) {
     const maxX = 5;
     const maxY = 8;
 

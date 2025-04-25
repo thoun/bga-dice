@@ -13,11 +13,18 @@ For example, if you have dice in 3 stocks on your game, you will create 1 manage
 
 JS file:
 ```js
-loadBgaGameLib('bga-dice', '0.x');
-
-/* ... */
-
-    constructor: function() {
+define([
+   "dojo","dojo/_base/declare",
+   "dojo/debounce",
+   "ebg/core/gamegui",
+   /*...,*/
+   getLibUrl('bga-animations', '0.0.x'),
+   getLibUrl('bga-dice', '0.0.x'),
+],
+function (dojo, declare, debounce, gamegui, /*...,*/, BgaAnimations, BgaDice) {
+    // make sure the BgaAnimations variable match the above array index, if `getLibUrl('bga-animations', '0.0.x')` is at the 6th position of the array, BgaAnimations should be the 6th param
+   return declare("bgagame.mygame", gamegui, {
+      setup: function() {
         // create the dice manager
         this.diceManager = new BgaDice.Manager(...);
 

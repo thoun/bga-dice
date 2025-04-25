@@ -1,0 +1,4 @@
+include:
+  - project: 'boardgamearena/gitlab-ci-templates'
+    file: '.gitlab/templates/game-libs.yml'
+    ref: 'main'

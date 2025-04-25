@@ -1,4 +1,7 @@
-interface LineStockSettings extends DieStockSettings {
+import { DiceManager } from "../dice-manager";
+import { DieStockSettings, DiceStock } from "./dice-stock";
+
+export interface LineStockSettings<T> extends DieStockSettings<T> {
     /**
      * Indicate if the line should wrap when needed (default wrap)
      */
@@ -23,13 +26,13 @@ interface LineStockSettings extends DieStockSettings {
 /**
  * A basic stock for a list of dice, based on flex.
  */
-class LineDiceStock<T> extends DiceStock<T> {
+export class LineStock<T> extends DiceStock<T> {
     /**
      * @param manager the die manager  
      * @param element the stock element (should be an empty HTML Element)
      * @param settings a `LineStockSettings` object
      */
-    constructor(protected manager: DiceManager<T>, protected element: HTMLElement, settings?: LineStockSettings) {
+    constructor(protected manager: DiceManager<T>, protected element: HTMLElement, settings?: LineStockSettings<T>) {
         super(manager, element, settings);
         element.classList.add('bga-dice_line-stock');
 

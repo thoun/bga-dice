@@ -7,7 +7,7 @@ const BGA_DIE4_FACE_NUMBERS = {
     4: [1, 2, 3],
 };
 
-function initD4Manager() {
+function initD4Manager(BgaDice) {
     d4Manager = new BgaDice.Manager({
         animationManager: animationManager,
         type: 'kot-die4',
