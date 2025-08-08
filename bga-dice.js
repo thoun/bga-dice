@@ -567,6 +567,21 @@ var BgaDie6 = /** @class */ (function () {
     };
     return BgaDie6;
 }());
+var BgaDie8 = /** @class */ (function () {
+    function BgaDie8() {
+        this.facesCount = 8;
+    }
+    /**
+     * Allow to populate the main div of the die. You can set classes or dataset, if it's informations shared by all faces.
+     *
+     * @param die the die informations
+     * @param element the die main Div element
+     */
+    BgaDie8.prototype.setupDieDiv = function (die, element) {
+        element.classList.add('bga-dice_die8');
+    };
+    return BgaDie8;
+}());
 /**
  * The abstract stock. It shouldn't be used directly, use stocks that extends it.
  */
@@ -1024,17 +1039,17 @@ var DiceStock = /** @class */ (function () {
     DiceStock.prototype.animationFromElement = function (element, fromRect, settings) {
         var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var side, diceides_1, animation, result;
+            var side, dieSides_1, animation, result;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         side = element.dataset.side;
                         if (settings.originalSide && settings.originalSide != side) {
-                            diceides_1 = element.getElementsByClassName('die-sides')[0];
-                            diceides_1.style.transition = 'none';
+                            dieSides_1 = element.getElementsByClassName('bga-dice_die-face')[0];
+                            dieSides_1.style.transition = 'none';
                             element.dataset.side = settings.originalSide;
                             setTimeout(function () {
-                                diceides_1.style.transition = null;
+                                dieSides_1.style.transition = null;
                                 element.dataset.side = side;
                             });
                         }

@@ -1,3 +1,6 @@
+# THIS LIB IS DEPRECATED!
+It's replaced by [bga-dice](https://en.doc.boardgamearena.com/BgaDice)
+
 # Links
 [Documentation](https://thoun.github.io/bga-dice/docs/index.html)
 

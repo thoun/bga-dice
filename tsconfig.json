@@ -23,6 +23,7 @@
       "src/die.ts",
       "src/dice/die4.ts",
       "src/dice/die6.ts",
+      "src/dice/die8.ts",
       "src/stocks/dice-stock.ts",
       "src/stocks/line-stock.ts",
       "src/stocks/slot-stock.ts",

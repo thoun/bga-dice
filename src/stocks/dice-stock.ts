@@ -554,11 +554,11 @@ class DiceStock {
     protected async animationFromElement(element: HTMLElement, fromRect: DOMRect, settings: DieAnimationSettings): Promise<boolean> {
         const side = element.dataset.side;
         if (settings.originalSide && settings.originalSide != side) {
-            const diceides = element.getElementsByClassName('die-sides')[0] as HTMLDivElement;
-            diceides.style.transition = 'none';
+            const dieSides = element.getElementsByClassName('bga-dice_die-face')[0] as HTMLDivElement;//element.getElementsByClassName('die-sides')[0] as HTMLDivElement;
+            dieSides.style.transition = 'none';
             element.dataset.side = settings.originalSide;
             setTimeout(() => {
-                diceides.style.transition = null;
+                dieSides.style.transition = null;
                 element.dataset.side = side;
             });
         }

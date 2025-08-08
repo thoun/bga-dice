@@ -60,7 +60,7 @@ h1, h2 {
     font-size: 16pt;
     font-weight: bold;
     padding-top: calc(var(--size) * 0.1);
-  }
+}
 
 .kot-die4 .bga-dice_die-face-number[data-number="1"]::after {
     content: '1';
@@ -124,3 +124,6 @@ h1, h2 {
     box-shadow: 0 0 5px 3px blueviolet;
 }
 
+.bga-dice_die8 .bga-dice_die-face {
+    background: linear-gradient(90deg, cyan 0%, blue 100%);
+}
